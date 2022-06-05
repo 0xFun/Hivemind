@@ -46,6 +46,12 @@ import {
   TransparentUpgradeableProxy__factory,
   LensPeriphery,
   LensPeriphery__factory,
+  ProfileFollowModule,
+  ProfileFollowModule__factory,
+  FollowNFT,
+  CollectNFT,
+  RevertFollowModule,
+  RevertFollowModule__factory,
 } from '../typechain-types';
 import { LensHubLibraryAddresses } from '../typechain-types/factories/LensHub__factory';
 import { FAKE_PRIVATEKEY, ZERO_ADDRESS } from './helpers/constants';
@@ -63,8 +69,8 @@ export const BPS_MAX = 10000;
 export const TREASURY_FEE_BPS = 50;
 export const REFERRAL_FEE_BPS = 250;
 export const MAX_PROFILE_IMAGE_URI_LENGTH = 6000;
-export const LENS_HUB_NFT_NAME = 'Lens Profiles';
-export const LENS_HUB_NFT_SYMBOL = 'LENS';
+export const LENS_HUB_NFT_NAME = 'Lens Protocol Profiles';
+export const LENS_HUB_NFT_SYMBOL = 'LPP';
 export const MOCK_PROFILE_HANDLE = 'plant1ghost.eth';
 export const LENS_PERIPHERY_NAME = 'LensPeriphery';
 export const FIRST_PROFILE_ID = 1;
@@ -86,8 +92,6 @@ export let userAddress: string;
 export let userTwoAddress: string;
 export let userThreeAddress: string;
 export let governanceAddress: string;
-export let followNFTImplAddress: string;
-export let collectNFTImplAddress: string;
 export let treasuryAddress: string;
 export let testWallet: Wallet;
 export let lensHubImpl: LensHub;
@@ -100,6 +104,8 @@ export let eventsLib: Events;
 export let moduleGlobals: ModuleGlobals;
 export let helper: Helper;
 export let lensPeriphery: LensPeriphery;
+export let followNFTImpl: FollowNFT;
+export let collectNFTImpl: CollectNFT;
 
 /* Modules */
 
@@ -113,7 +119,9 @@ export let limitedTimedFeeCollectModule: LimitedTimedFeeCollectModule;
 
 // Follow
 export let approvalFollowModule: ApprovalFollowModule;
+export let profileFollowModule: ProfileFollowModule;
 export let feeFollowModule: FeeFollowModule;
+export let revertFollowModule: RevertFollowModule;
 export let mockFollowModule: MockFollowModule;
 
 // Reference
@@ -175,8 +183,8 @@ before(async function () {
 
   const hubProxyAddress = computeContractAddress(deployerAddress, nonce + 3); //'0x' + keccak256(RLP.encode([deployerAddress, hubProxyNonce])).substr(26);
 
-  const followNFTImpl = await new FollowNFT__factory(deployer).deploy(hubProxyAddress);
-  const collectNFTImpl = await new CollectNFT__factory(deployer).deploy(hubProxyAddress);
+  followNFTImpl = await new FollowNFT__factory(deployer).deploy(hubProxyAddress);
+  collectNFTImpl = await new CollectNFT__factory(deployer).deploy(hubProxyAddress);
 
   lensHubImpl = await new LensHub__factory(hubLibs, deployer).deploy(
     followNFTImpl.address,
@@ -198,9 +206,8 @@ before(async function () {
   lensHub = LensHub__factory.connect(proxy.address, user);
 
   // LensPeriphery
-  lensPeriphery = await new LensPeriphery__factory(deployer).deploy(
-    lensHub.address
-  );
+  lensPeriphery = await new LensPeriphery__factory(deployer).deploy(lensHub.address);
+  lensPeriphery = lensPeriphery.connect(user);
 
   // Currency
   currency = await new Currency__factory(deployer).deploy();
@@ -229,7 +236,9 @@ before(async function () {
     lensHub.address,
     moduleGlobals.address
   );
+  profileFollowModule = await new ProfileFollowModule__factory(deployer).deploy(lensHub.address);
   approvalFollowModule = await new ApprovalFollowModule__factory(deployer).deploy(lensHub.address);
+  revertFollowModule = await new RevertFollowModule__factory(deployer).deploy(lensHub.address);
   followerOnlyReferenceModule = await new FollowerOnlyReferenceModule__factory(deployer).deploy(
     lensHub.address
   );

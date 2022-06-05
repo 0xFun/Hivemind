@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -15,7 +15,7 @@ import {LensNFTBase} from './base/LensNFTBase.sol';
  * @notice This is the NFT contract that is minted upon collecting a given publication. It is cloned upon
  * the first collect for a given publication, and the token URI points to the original publication's contentURI.
  */
-contract CollectNFT is ICollectNFT, LensNFTBase {
+contract CollectNFT is LensNFTBase, ICollectNFT {
     address public immutable HUB;
 
     uint256 internal _profileId;
@@ -48,11 +48,12 @@ contract CollectNFT is ICollectNFT, LensNFTBase {
     }
 
     /// @inheritdoc ICollectNFT
-    function mint(address to) external override {
+    function mint(address to) external override returns (uint256) {
         if (msg.sender != HUB) revert Errors.NotHub();
         unchecked {
             uint256 tokenId = ++_tokenIdCounter;
             _mint(to, tokenId);
+            return tokenId;
         }
     }
 

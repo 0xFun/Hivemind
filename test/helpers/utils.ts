@@ -1,5 +1,5 @@
 import '@nomiclabs/hardhat-ethers';
-import { BigNumberish, Bytes, logger, utils, BigNumber, Contract } from 'ethers';
+import { BigNumberish, Bytes, logger, utils, BigNumber, Contract, Signer } from 'ethers';
 import {
   eventsLib,
   helper,
@@ -8,15 +8,27 @@ import {
   lensPeriphery,
   LENS_PERIPHERY_NAME,
   testWallet,
+  user,
 } from '../__setup.spec';
 import { expect } from 'chai';
 import { HARDHAT_CHAINID, MAX_UINT256 } from './constants';
-import { hexlify, keccak256, RLP, toUtf8Bytes } from 'ethers/lib/utils';
+import { BytesLike, hexlify, keccak256, RLP, toUtf8Bytes } from 'ethers/lib/utils';
 import { LensHub__factory } from '../../typechain-types';
 import { TransactionReceipt, TransactionResponse } from '@ethersproject/providers';
 import hre, { ethers } from 'hardhat';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import {
+  CollectWithSigDataStruct,
+  CommentDataStruct,
+  CommentWithSigDataStruct,
+  CreateProfileDataStruct,
+  FollowWithSigDataStruct,
+  MirrorDataStruct,
+  MirrorWithSigDataStruct,
+  PostDataStruct,
+  PostWithSigDataStruct,
+} from '../../typechain-types/LensHub';
 
 export enum ProtocolState {
   Unpaused,
@@ -83,6 +95,10 @@ export function matchEvent(
             } else if (event.args[i].constructor == Array) {
               let params = event.args[i];
               let expected = expectedArgs[i];
+              if (expected != '0x' && params.length != expected.length) {
+                invalidParamsButExists = true;
+                break;
+              }
               for (let j = 0; j < params.length; j++) {
                 if (BigNumber.isBigNumber(params[j])) {
                   if (!params[j].eq(BigNumber.from(expected[j]))) {
@@ -157,7 +173,7 @@ export async function resetFork(): Promise<void> {
     params: [
       {
         forking: {
-          jsonRpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+          jsonRpcUrl: process.env.MAINNET_RPC_URL,
           blockNumber: 12012081,
         },
       },
@@ -300,14 +316,14 @@ const buildDelegateBySigParams = (
 export async function getSetFollowModuleWithSigParts(
   profileId: BigNumberish,
   followModule: string,
-  followModuleData: Bytes | string,
+  followModuleInitData: Bytes | string,
   nonce: number,
   deadline: string
 ): Promise<{ v: number; r: string; s: string }> {
   const msgParams = buildSetFollowModuleWithSigParams(
     profileId,
     followModule,
-    followModuleData,
+    followModuleInitData,
     nonce,
     deadline
   );
@@ -358,9 +374,9 @@ export async function getPostWithSigParts(
   profileId: BigNumberish,
   contentURI: string,
   collectModule: string,
-  collectModuleData: Bytes | string,
+  collectModuleInitData: Bytes | string,
   referenceModule: string,
-  referenceModuleData: Bytes | string,
+  referenceModuleInitData: Bytes | string,
   nonce: number,
   deadline: string
 ): Promise<{ v: number; r: string; s: string }> {
@@ -368,9 +384,9 @@ export async function getPostWithSigParts(
     profileId,
     contentURI,
     collectModule,
-    collectModuleData,
+    collectModuleInitData,
     referenceModule,
-    referenceModuleData,
+    referenceModuleInitData,
     nonce,
     deadline
   );
@@ -382,10 +398,11 @@ export async function getCommentWithSigParts(
   contentURI: string,
   profileIdPointed: BigNumberish,
   pubIdPointed: string,
-  collectModule: string,
-  collectModuleData: Bytes | string,
-  referenceModule: string,
   referenceModuleData: Bytes | string,
+  collectModule: string,
+  collectModuleInitData: Bytes | string,
+  referenceModule: string,
+  referenceModuleInitData: Bytes | string,
   nonce: number,
   deadline: string
 ): Promise<{ v: number; r: string; s: string }> {
@@ -394,10 +411,11 @@ export async function getCommentWithSigParts(
     contentURI,
     profileIdPointed,
     pubIdPointed,
-    collectModule,
-    collectModuleData,
-    referenceModule,
     referenceModuleData,
+    collectModule,
+    collectModuleInitData,
+    referenceModule,
+    referenceModuleInitData,
     nonce,
     deadline
   );
@@ -408,8 +426,9 @@ export async function getMirrorWithSigParts(
   profileId: BigNumberish,
   profileIdPointed: BigNumberish,
   pubIdPointed: string,
-  referenceModule: string,
   referenceModuleData: Bytes | string,
+  referenceModule: string,
+  referenceModuleInitData: Bytes | string,
   nonce: number,
   deadline: string
 ): Promise<{ v: number; r: string; s: string }> {
@@ -417,8 +436,9 @@ export async function getMirrorWithSigParts(
     profileId,
     profileIdPointed,
     pubIdPointed,
-    referenceModule,
     referenceModuleData,
+    referenceModule,
+    referenceModuleInitData,
     nonce,
     deadline
   );
@@ -445,6 +465,16 @@ export async function getToggleFollowWithSigParts(
   return await getSig(msgParams);
 }
 
+export async function getSetProfileMetadataURIWithSigParts(
+  profileId: string | number,
+  metadata: string,
+  nonce: number,
+  deadline: string
+): Promise<{ v: number; r: string; s: string }> {
+  const msgParams = buildSetProfileMetadataURIWithSigParams(profileId, metadata, nonce, deadline);
+  return await getSig(msgParams);
+}
+
 export async function getCollectWithSigParts(
   profileId: BigNumberish,
   pubId: string,
@@ -454,6 +484,151 @@ export async function getCollectWithSigParts(
 ): Promise<{ v: number; r: string; s: string }> {
   const msgParams = buildCollectWithSigParams(profileId, pubId, data, nonce, deadline);
   return await getSig(msgParams);
+}
+
+export function expectEqualArrays(actual: BigNumberish[], expected: BigNumberish[]) {
+  if (actual.length != expected.length) {
+    logger.throwError(
+      `${actual} length ${actual.length} does not match ${expected} length ${expect.length}`
+    );
+  }
+
+  let areEquals = true;
+  for (let i = 0; areEquals && i < actual.length; i++) {
+    areEquals = BigNumber.from(actual[i]).eq(BigNumber.from(expected[i]));
+  }
+
+  if (!areEquals) {
+    logger.throwError(`${actual} does not match ${expected}`);
+  }
+}
+
+export interface CreateProfileReturningTokenIdStruct {
+  sender?: Signer;
+  vars: CreateProfileDataStruct;
+}
+
+export async function createProfileReturningTokenId({
+  sender = user,
+  vars,
+}: CreateProfileReturningTokenIdStruct): Promise<BigNumber> {
+  const tokenId = await lensHub.connect(sender).callStatic.createProfile(vars);
+  await expect(lensHub.connect(sender).createProfile(vars)).to.not.be.reverted;
+  return tokenId;
+}
+
+export interface FollowDataStruct {
+  profileIds: BigNumberish[];
+  datas: BytesLike[];
+}
+
+export interface FollowReturningTokenIdsStruct {
+  sender?: Signer;
+  vars: FollowDataStruct | FollowWithSigDataStruct;
+}
+
+export async function followReturningTokenIds({
+  sender = user,
+  vars,
+}: FollowReturningTokenIdsStruct): Promise<BigNumber[]> {
+  let tokenIds;
+  if ('sig' in vars) {
+    tokenIds = await lensHub.connect(sender).callStatic.followWithSig(vars);
+    await expect(lensHub.connect(sender).followWithSig(vars)).to.not.be.reverted;
+  } else {
+    tokenIds = await lensHub.connect(sender).callStatic.follow(vars.profileIds, vars.datas);
+    await expect(lensHub.connect(sender).follow(vars.profileIds, vars.datas)).to.not.be.reverted;
+  }
+  return tokenIds;
+}
+
+export interface CollectDataStruct {
+  profileId: BigNumberish;
+  pubId: BigNumberish;
+  data: BytesLike;
+}
+
+export interface CollectReturningTokenIdsStruct {
+  sender?: Signer;
+  vars: CollectDataStruct | CollectWithSigDataStruct;
+}
+
+export async function collectReturningTokenIds({
+  sender = user,
+  vars,
+}: CollectReturningTokenIdsStruct): Promise<BigNumber> {
+  let tokenId;
+  if ('sig' in vars) {
+    tokenId = await lensHub.connect(sender).callStatic.collectWithSig(vars);
+    await expect(lensHub.connect(sender).collectWithSig(vars)).to.not.be.reverted;
+  } else {
+    tokenId = await lensHub
+      .connect(sender)
+      .callStatic.collect(vars.profileId, vars.pubId, vars.data);
+    await expect(lensHub.connect(sender).collect(vars.profileId, vars.pubId, vars.data)).to.not.be
+      .reverted;
+  }
+  return tokenId;
+}
+
+export interface CommentReturningTokenIdStruct {
+  sender?: Signer;
+  vars: CommentDataStruct | CommentWithSigDataStruct;
+}
+
+export async function commentReturningTokenId({
+  sender = user,
+  vars,
+}: CommentReturningTokenIdStruct): Promise<BigNumber> {
+  let tokenId;
+  if ('sig' in vars) {
+    tokenId = await lensHub.connect(sender).callStatic.commentWithSig(vars);
+    await expect(lensHub.connect(sender).commentWithSig(vars)).to.not.be.reverted;
+  } else {
+    tokenId = await lensHub.connect(sender).callStatic.comment(vars);
+    await expect(lensHub.connect(sender).comment(vars)).to.not.be.reverted;
+  }
+  return tokenId;
+}
+
+export interface MirrorReturningTokenIdStruct {
+  sender?: Signer;
+  vars: MirrorDataStruct | MirrorWithSigDataStruct;
+}
+
+export async function mirrorReturningTokenId({
+  sender = user,
+  vars,
+}: MirrorReturningTokenIdStruct): Promise<BigNumber> {
+  let tokenId;
+  if ('sig' in vars) {
+    tokenId = await lensHub.connect(sender).callStatic.mirrorWithSig(vars);
+    await expect(lensHub.connect(sender).mirrorWithSig(vars)).to.not.be.reverted;
+  } else {
+    tokenId = await lensHub.connect(sender).callStatic.mirror(vars);
+    await expect(lensHub.connect(sender).mirror(vars)).to.not.be.reverted;
+  }
+  return tokenId;
+}
+
+export interface PostReturningTokenIdStruct {
+  sender?: Signer;
+  vars: PostDataStruct | PostWithSigDataStruct;
+}
+
+export async function postReturningTokenId({
+  sender = user,
+  vars,
+}: PostReturningTokenIdStruct): Promise<BigNumber> {
+  let tokenId;
+  if ('sig' in vars) {
+    tokenId = await lensHub.connect(sender).callStatic.postWithSig(vars);
+    await expect(lensHub.connect(sender).postWithSig(vars)).to.not.be.reverted;
+  } else {
+    tokenId = await lensHub.connect(sender).callStatic.post(vars);
+    await expect(lensHub.connect(sender).post(vars)).to.not.be.reverted;
+  }
+  return tokenId;
 }
 
 export interface TokenUriMetadataAttribute {
@@ -589,7 +764,7 @@ const buildBurnWithSigParams = (
 const buildSetFollowModuleWithSigParams = (
   profileId: BigNumberish,
   followModule: string,
-  followModuleData: Bytes | string,
+  followModuleInitData: Bytes | string,
   nonce: number,
   deadline: string
 ) => ({
@@ -597,7 +772,7 @@ const buildSetFollowModuleWithSigParams = (
     SetFollowModuleWithSig: [
       { name: 'profileId', type: 'uint256' },
       { name: 'followModule', type: 'address' },
-      { name: 'followModuleData', type: 'bytes' },
+      { name: 'followModuleInitData', type: 'bytes' },
       { name: 'nonce', type: 'uint256' },
       { name: 'deadline', type: 'uint256' },
     ],
@@ -606,7 +781,7 @@ const buildSetFollowModuleWithSigParams = (
   value: {
     profileId: profileId,
     followModule: followModule,
-    followModuleData: followModuleData,
+    followModuleInitData: followModuleInitData,
     nonce: nonce,
     deadline: deadline,
   },
@@ -708,9 +883,9 @@ const buildPostWithSigParams = (
   profileId: BigNumberish,
   contentURI: string,
   collectModule: string,
-  collectModuleData: Bytes | string,
+  collectModuleInitData: Bytes | string,
   referenceModule: string,
-  referenceModuleData: Bytes | string,
+  referenceModuleInitData: Bytes | string,
   nonce: number,
   deadline: string
 ) => ({
@@ -719,9 +894,9 @@ const buildPostWithSigParams = (
       { name: 'profileId', type: 'uint256' },
       { name: 'contentURI', type: 'string' },
       { name: 'collectModule', type: 'address' },
-      { name: 'collectModuleData', type: 'bytes' },
+      { name: 'collectModuleInitData', type: 'bytes' },
       { name: 'referenceModule', type: 'address' },
-      { name: 'referenceModuleData', type: 'bytes' },
+      { name: 'referenceModuleInitData', type: 'bytes' },
       { name: 'nonce', type: 'uint256' },
       { name: 'deadline', type: 'uint256' },
     ],
@@ -731,9 +906,9 @@ const buildPostWithSigParams = (
     profileId: profileId,
     contentURI: contentURI,
     collectModule: collectModule,
-    collectModuleData: collectModuleData,
+    collectModuleInitData: collectModuleInitData,
     referenceModule: referenceModule,
-    referenceModuleData: referenceModuleData,
+    referenceModuleInitData: referenceModuleInitData,
     nonce: nonce,
     deadline: deadline,
   },
@@ -744,10 +919,11 @@ const buildCommentWithSigParams = (
   contentURI: string,
   profileIdPointed: BigNumberish,
   pubIdPointed: string,
-  collectModule: string,
-  collectModuleData: Bytes | string,
-  referenceModule: string,
   referenceModuleData: Bytes | string,
+  collectModule: string,
+  collectModuleInitData: Bytes | string,
+  referenceModule: string,
+  referenceModuleInitData: Bytes | string,
   nonce: number,
   deadline: string
 ) => ({
@@ -757,10 +933,11 @@ const buildCommentWithSigParams = (
       { name: 'contentURI', type: 'string' },
       { name: 'profileIdPointed', type: 'uint256' },
       { name: 'pubIdPointed', type: 'uint256' },
-      { name: 'collectModule', type: 'address' },
-      { name: 'collectModuleData', type: 'bytes' },
-      { name: 'referenceModule', type: 'address' },
       { name: 'referenceModuleData', type: 'bytes' },
+      { name: 'collectModule', type: 'address' },
+      { name: 'collectModuleInitData', type: 'bytes' },
+      { name: 'referenceModule', type: 'address' },
+      { name: 'referenceModuleInitData', type: 'bytes' },
       { name: 'nonce', type: 'uint256' },
       { name: 'deadline', type: 'uint256' },
     ],
@@ -771,10 +948,11 @@ const buildCommentWithSigParams = (
     contentURI: contentURI,
     profileIdPointed: profileIdPointed,
     pubIdPointed: pubIdPointed,
-    collectModule: collectModule,
-    collectModuleData: collectModuleData,
-    referenceModule: referenceModule,
     referenceModuleData: referenceModuleData,
+    collectModule: collectModule,
+    collectModuleInitData: collectModuleInitData,
+    referenceModule: referenceModule,
+    referenceModuleInitData: referenceModuleInitData,
     nonce: nonce,
     deadline: deadline,
   },
@@ -784,8 +962,9 @@ const buildMirrorWithSigParams = (
   profileId: BigNumberish,
   profileIdPointed: BigNumberish,
   pubIdPointed: string,
-  referenceModule: string,
   referenceModuleData: Bytes | string,
+  referenceModule: string,
+  referenceModuleInitData: Bytes | string,
   nonce: number,
   deadline: string
 ) => ({
@@ -794,8 +973,9 @@ const buildMirrorWithSigParams = (
       { name: 'profileId', type: 'uint256' },
       { name: 'profileIdPointed', type: 'uint256' },
       { name: 'pubIdPointed', type: 'uint256' },
-      { name: 'referenceModule', type: 'address' },
       { name: 'referenceModuleData', type: 'bytes' },
+      { name: 'referenceModule', type: 'address' },
+      { name: 'referenceModuleInitData', type: 'bytes' },
       { name: 'nonce', type: 'uint256' },
       { name: 'deadline', type: 'uint256' },
     ],
@@ -805,8 +985,9 @@ const buildMirrorWithSigParams = (
     profileId: profileId,
     profileIdPointed: profileIdPointed,
     pubIdPointed: pubIdPointed,
-    referenceModule: referenceModule,
     referenceModuleData: referenceModuleData,
+    referenceModule: referenceModule,
+    referenceModuleInitData: referenceModuleInitData,
     nonce: nonce,
     deadline: deadline,
   },
@@ -858,6 +1039,34 @@ const buildToggleFollowWithSigParams = (
   value: {
     profileIds: profileIds,
     enables: enables,
+    nonce: nonce,
+    deadline: deadline,
+  },
+});
+
+const buildSetProfileMetadataURIWithSigParams = (
+  profileId: string | number,
+  metadata: string,
+  nonce: number,
+  deadline: string
+) => ({
+  types: {
+    SetProfileMetadataURIWithSig: [
+      { name: 'profileId', type: 'uint256' },
+      { name: 'metadata', type: 'string' },
+      { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ],
+  },
+  domain: {
+    name: LENS_PERIPHERY_NAME,
+    version: '1',
+    chainId: getChainId(),
+    verifyingContract: lensPeriphery.address,
+  },
+  value: {
+    profileId: profileId,
+    metadata: metadata,
     nonce: nonce,
     deadline: deadline,
   },

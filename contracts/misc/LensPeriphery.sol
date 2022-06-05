@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -9,8 +9,8 @@ import {Events} from '../libraries/Events.sol';
 import {Errors} from '../libraries/Errors.sol';
 
 /**
- * @notice This is a peripheral contract that allows for users to emit an event demonstrating whether or not
- * they explicitly want a follow to be shown.
+ * @notice This is a peripheral contract that acts as a source of truth for profile metadata and allows
+ * for users to emit an event demonstrating whether or not they explicitly want a follow to be shown.
  *
  * @dev This is useful because it allows clients to filter out follow NFTs that were transferred to
  * a recipient by another user (i.e. Not a mint) and not register them as "following" unless
@@ -27,13 +27,59 @@ contract LensPeriphery {
         keccak256(
             'ToggleFollowWithSig(uint256[] profileIds,bool[] enables,uint256 nonce,uint256 deadline)'
         );
+    bytes32 internal constant SET_PROFILE_METADATA_WITH_SIG_TYPEHASH =
+        keccak256(
+            'SetProfileMetadataURIWithSig(uint256 profileId,string metadata,uint256 nonce,uint256 deadline)'
+        );
 
-    ILensHub immutable HUB;
+    ILensHub public immutable HUB;
 
     mapping(address => uint256) public sigNonces;
 
+    mapping(uint256 => string) internal _metadataByProfile;
+
     constructor(ILensHub hub) {
         HUB = hub;
+    }
+
+    /**
+     * @notice Sets the profile metadata for a given profile.
+     *
+     * @param profileId The profile ID to set the metadata for.
+     * @param metadata The metadata string to set for the profile.
+     */
+    function setProfileMetadataURI(uint256 profileId, string calldata metadata) external {
+        _validateCallerIsProfileOwnerOrDispatcher(profileId);
+        _setProfileMetadataURI(profileId, metadata);
+    }
+
+    /**
+     * @notice Sets the profile metadata for a given profile via signature with the specified parameters.
+     *
+     * @param vars A SetProfileMetadataWithSigData struct containingthe regular parameters and an EIP712Signature struct.
+     */
+    function setProfileMetadataURIWithSig(DataTypes.SetProfileMetadataWithSigData calldata vars)
+        external
+    {
+        unchecked {
+            address owner = IERC721Time(address(HUB)).ownerOf(vars.profileId);
+            _validateRecoveredAddress(
+                _calculateDigest(
+                    keccak256(
+                        abi.encode(
+                            SET_PROFILE_METADATA_WITH_SIG_TYPEHASH,
+                            vars.profileId,
+                            keccak256(bytes(vars.metadata)),
+                            sigNonces[owner]++,
+                            vars.sig.deadline
+                        )
+                    )
+                ),
+                owner,
+                vars.sig
+            );
+        }
+        _setProfileMetadataURI(vars.profileId, vars.metadata);
     }
 
     /**
@@ -55,22 +101,41 @@ contract LensPeriphery {
      * and an EIP712Signature struct.
      */
     function toggleFollowWithSig(DataTypes.ToggleFollowWithSigData calldata vars) external {
-        _validateRecoveredAddress(
-            _calculateDigest(
-                keccak256(
-                    abi.encode(
-                        TOGGLE_FOLLOW_WITH_SIG_TYPEHASH,
-                        keccak256(abi.encodePacked(vars.profileIds)),
-                        keccak256(abi.encodePacked(vars.enables)),
-                        sigNonces[vars.follower]++,
-                        vars.sig.deadline
+        unchecked {
+            _validateRecoveredAddress(
+                _calculateDigest(
+                    keccak256(
+                        abi.encode(
+                            TOGGLE_FOLLOW_WITH_SIG_TYPEHASH,
+                            keccak256(abi.encodePacked(vars.profileIds)),
+                            keccak256(abi.encodePacked(vars.enables)),
+                            sigNonces[vars.follower]++,
+                            vars.sig.deadline
+                        )
                     )
-                )
-            ),
-            vars.follower,
-            vars.sig
-        );
+                ),
+                vars.follower,
+                vars.sig
+            );
+        }
+
         _toggleFollow(vars.follower, vars.profileIds, vars.enables);
+    }
+
+    /**
+     * @notice Returns the metadata URI of a profile.
+     *
+     * @param profileId The profile ID to query the metadata URI for.
+     *
+     * @return string The metadata associated with that profile ID, or an empty string if it is not set or the profile does not exist.
+     */
+    function getProfileMetadataURI(uint256 profileId) external view returns (string memory) {
+        return _metadataByProfile[profileId];
+    }
+
+    function _setProfileMetadataURI(uint256 profileId, string calldata metadata) internal {
+        _metadataByProfile[profileId] = metadata;
+        emit Events.ProfileMetadataSet(profileId, metadata, block.timestamp);
     }
 
     function _toggleFollow(
@@ -90,6 +155,16 @@ contract LensPeriphery {
             }
         }
         emit Events.FollowsToggled(follower, profileIds, enables, block.timestamp);
+    }
+
+    function _validateCallerIsProfileOwnerOrDispatcher(uint256 profileId) internal view {
+        if (
+            msg.sender == IERC721Time(address(HUB)).ownerOf(profileId) ||
+            msg.sender == HUB.getDispatcher(profileId)
+        ) {
+            return;
+        }
+        revert Errors.NotProfileOwnerOrDispatcher();
     }
 
     /**

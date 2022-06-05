@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -8,6 +8,7 @@ import {ILensHub} from '../interfaces/ILensHub.sol';
 import {Errors} from '../libraries/Errors.sol';
 import {Events} from '../libraries/Events.sol';
 import {DataTypes} from '../libraries/DataTypes.sol';
+import {Constants} from '../libraries/Constants.sol';
 import {LensNFTBase} from './base/LensNFTBase.sol';
 
 /**
@@ -28,10 +29,9 @@ contract FollowNFT is LensNFTBase, IFollowNFT {
     address public immutable HUB;
 
     bytes32 internal constant DELEGATE_BY_SIG_TYPEHASH =
-        0xb8f190a57772800093f4e2b186099eb4f1df0ed7f5e2791e89a4a07678e0aeff;
-    // keccak256(
-    // 'DelegateBySig(address delegator,address delegatee,uint256 nonce,uint256 deadline)'
-    // );
+        keccak256(
+            'DelegateBySig(address delegator,address delegatee,uint256 nonce,uint256 deadline)'
+        );
 
     mapping(address => mapping(uint256 => Snapshot)) internal _snapshots;
     mapping(address => address) internal _delegates;
@@ -51,24 +51,20 @@ contract FollowNFT is LensNFTBase, IFollowNFT {
     }
 
     /// @inheritdoc IFollowNFT
-    function initialize(
-        uint256 profileId,
-        string calldata name,
-        string calldata symbol
-    ) external override {
+    function initialize(uint256 profileId) external override {
         if (_initialized) revert Errors.Initialized();
         _initialized = true;
         _profileId = profileId;
-        super._initialize(name, symbol);
         emit Events.FollowNFTInitialized(profileId, block.timestamp);
     }
 
     /// @inheritdoc IFollowNFT
-    function mint(address to) external override {
+    function mint(address to) external override returns (uint256) {
         if (msg.sender != HUB) revert Errors.NotHub();
         unchecked {
             uint256 tokenId = ++_tokenIdCounter;
             _mint(to, tokenId);
+            return tokenId;
         }
     }
 
@@ -83,21 +79,23 @@ contract FollowNFT is LensNFTBase, IFollowNFT {
         address delegatee,
         DataTypes.EIP712Signature calldata sig
     ) external override {
-        _validateRecoveredAddress(
-            _calculateDigest(
-                keccak256(
-                    abi.encode(
-                        DELEGATE_BY_SIG_TYPEHASH,
-                        delegator,
-                        delegatee,
-                        sigNonces[delegator]++,
-                        sig.deadline
+        unchecked {
+            _validateRecoveredAddress(
+                _calculateDigest(
+                    keccak256(
+                        abi.encode(
+                            DELEGATE_BY_SIG_TYPEHASH,
+                            delegator,
+                            delegatee,
+                            sigNonces[delegator]++,
+                            sig.deadline
+                        )
                     )
-                )
-            ),
-            delegator,
-            sig
-        );
+                ),
+                delegator,
+                sig
+            );
+        }
         _delegate(delegator, delegatee);
     }
 
@@ -125,6 +123,17 @@ contract FollowNFT is LensNFTBase, IFollowNFT {
         uint256 snapshotCount = _delSupplySnapshotCount;
         if (snapshotCount == 0) return 0; // Returning zero since this means a delegation has never occurred
         return _getSnapshotValueByBlockNumber(_delSupplySnapshots, blockNumber, snapshotCount);
+    }
+
+    function name() public view override returns (string memory) {
+        string memory handle = ILensHub(HUB).getHandle(_profileId);
+        return string(abi.encodePacked(handle, Constants.FOLLOW_NFT_NAME_SUFFIX));
+    }
+
+    function symbol() public view override returns (string memory) {
+        string memory handle = ILensHub(HUB).getHandle(_profileId);
+        bytes4 firstBytes = bytes4(bytes(handle));
+        return string(abi.encodePacked(firstBytes, Constants.FOLLOW_NFT_SYMBOL_SUFFIX));
     }
 
     function _getSnapshotValueByBlockNumber(

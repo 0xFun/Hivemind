@@ -1,6 +1,7 @@
 .env
 #Hardhat files
 cache
+.dccache
 artifacts
 node_modules
 dist/
@@ -16,16 +17,13 @@ build/
 /tasks/follow.ts
 /tasks/collect.ts
 /tasks/test-module.ts
-
 /coverage
 coverage.json
 .coverage_artifacts
 .coverage_cache
 .coverage_contracts
-
 addresses.json
-
 contracts/core/modules/follow/SecretCodeFollowModule.sol
-.dccache
-/node_modules
-.devcontainer/devcontainer.json
+.github/.DS_Store
+.DS_Store
+.gitignore

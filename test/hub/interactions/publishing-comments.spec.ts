@@ -2,7 +2,11 @@ import '@nomiclabs/hardhat-ethers';
 import { expect } from 'chai';
 import { MAX_UINT256, ZERO_ADDRESS } from '../../helpers/constants';
 import { ERRORS } from '../../helpers/errors';
-import { cancelWithPermitForAll, getCommentWithSigParts } from '../../helpers/utils';
+import {
+  cancelWithPermitForAll,
+  commentReturningTokenId,
+  getCommentWithSigParts,
+} from '../../helpers/utils';
 import {
   abiCoder,
   freeCollectModule,
@@ -20,6 +24,7 @@ import {
   timedFeeCollectModule,
   userAddress,
   userTwo,
+  userTwoAddress,
 } from '../../__setup.spec';
 
 makeSuiteCleanRoom('Publishing Comments', function () {
@@ -31,7 +36,7 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -53,9 +58,9 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
     });
@@ -69,9 +74,10 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
             collectModule: ZERO_ADDRESS,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-            referenceModule: ZERO_ADDRESS,
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.NOT_PROFILE_OWNER_OR_DISPATCHER);
       });
@@ -84,9 +90,10 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
             collectModule: ZERO_ADDRESS,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-            referenceModule: ZERO_ADDRESS,
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.COLLECT_MODULE_NOT_WHITELISTED);
       });
@@ -98,10 +105,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-            referenceModule: userAddress,
             referenceModuleData: [],
+            collectModule: freeCollectModule.address,
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
+            referenceModule: userAddress,
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.REFERENCE_MODULE_NOT_WHITELISTED);
       });
@@ -114,9 +122,10 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
             collectModule: timedFeeCollectModule.address,
-            collectModuleData: [0x2, 0x12, 0x20],
-            referenceModule: ZERO_ADDRESS,
+            collectModuleInitData: [0x2, 0x12, 0x20],
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.NO_REASON_ABI_DECODE);
       });
@@ -128,10 +137,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
+            referenceModuleData: [],
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: mockReferenceModule.address,
-            referenceModuleData: [0x12, 0x23],
+            referenceModuleInitData: [0x12, 0x23],
           })
         ).to.be.revertedWith(ERRORS.NO_REASON_ABI_DECODE);
       });
@@ -144,9 +154,10 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 3,
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-            referenceModule: ZERO_ADDRESS,
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.PUBLICATION_DOES_NOT_EXIST);
       });
@@ -159,9 +170,10 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 2,
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-            referenceModule: ZERO_ADDRESS,
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.CANNOT_COMMENT_ON_SELF);
       });
@@ -175,10 +187,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            collectModule: freeCollectModule.address,
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
@@ -191,6 +204,119 @@ makeSuiteCleanRoom('Publishing Comments', function () {
         expect(pub.referenceModule).to.eq(ZERO_ADDRESS);
       });
 
+      it('Should return the expected token IDs when commenting publications', async function () {
+        await expect(
+          lensHub.connect(testWallet).createProfile({
+            to: testWallet.address,
+            handle: 'testwallet',
+            imageURI: MOCK_PROFILE_URI,
+            followModule: ZERO_ADDRESS,
+            followModuleInitData: [],
+            followNFTURI: MOCK_FOLLOW_NFT_URI,
+          })
+        ).to.not.be.reverted;
+        await expect(
+          lensHub.connect(testWallet).createProfile({
+            to: userTwoAddress,
+            handle: 'usertwo',
+            imageURI: MOCK_PROFILE_URI,
+            followModule: ZERO_ADDRESS,
+            followModuleInitData: [],
+            followNFTURI: MOCK_FOLLOW_NFT_URI,
+          })
+        ).to.not.be.reverted;
+
+        const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
+        const referenceModuleData = [];
+
+        const { v, r, s } = await getCommentWithSigParts(
+          FIRST_PROFILE_ID + 1,
+          OTHER_MOCK_URI,
+          FIRST_PROFILE_ID,
+          '1',
+          referenceModuleData,
+          freeCollectModule.address,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
+          nonce,
+          MAX_UINT256
+        );
+        expect(
+          await commentReturningTokenId({
+            vars: {
+              profileId: FIRST_PROFILE_ID + 1,
+              contentURI: OTHER_MOCK_URI,
+              profileIdPointed: FIRST_PROFILE_ID,
+              pubIdPointed: '1',
+              collectModule: freeCollectModule.address,
+              collectModuleInitData: collectModuleInitData,
+              referenceModuleData: [],
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: referenceModuleInitData,
+              sig: {
+                v,
+                r,
+                s,
+                deadline: MAX_UINT256,
+              },
+            },
+          })
+        ).to.eq(1);
+
+        expect(
+          await commentReturningTokenId({
+            sender: userTwo,
+            vars: {
+              profileId: FIRST_PROFILE_ID + 2,
+              contentURI: MOCK_URI,
+              profileIdPointed: FIRST_PROFILE_ID,
+              pubIdPointed: 1,
+              collectModule: freeCollectModule.address,
+              collectModuleInitData: collectModuleInitData,
+              referenceModuleData: [],
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: referenceModuleInitData,
+            },
+          })
+        ).to.eq(1);
+
+        expect(
+          await commentReturningTokenId({
+            sender: testWallet,
+            vars: {
+              profileId: FIRST_PROFILE_ID + 1,
+              contentURI: MOCK_URI,
+              profileIdPointed: FIRST_PROFILE_ID,
+              pubIdPointed: 1,
+              collectModule: freeCollectModule.address,
+              collectModuleInitData: collectModuleInitData,
+              referenceModuleData: [],
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: referenceModuleInitData,
+            },
+          })
+        ).to.eq(2);
+
+        expect(
+          await commentReturningTokenId({
+            vars: {
+              profileId: FIRST_PROFILE_ID,
+              contentURI: MOCK_URI,
+              profileIdPointed: FIRST_PROFILE_ID,
+              pubIdPointed: 1,
+              collectModule: freeCollectModule.address,
+              collectModuleInitData: collectModuleInitData,
+              referenceModuleData: [],
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: referenceModuleInitData,
+            },
+          })
+        ).to.eq(2);
+      });
+
       it('User should create a post using the mock reference module as reference module, then comment on that post', async function () {
         const data = abiCoder.encode(['uint256'], ['1']);
         await expect(
@@ -198,9 +324,9 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: mockReferenceModule.address,
-            referenceModuleData: data,
+            referenceModuleInitData: data,
           })
         ).to.not.be.reverted;
 
@@ -209,11 +335,12 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 2,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
       });
@@ -228,7 +355,7 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -242,9 +369,9 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
     });
@@ -252,7 +379,8 @@ makeSuiteCleanRoom('Publishing Comments', function () {
     context('Negatives', function () {
       it('Testwallet should fail to comment with sig with signature deadline mismatch', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = abiCoder.encode(['bool'], [true]);
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -260,10 +388,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           MOCK_URI,
           FIRST_PROFILE_ID,
           '1',
-          ZERO_ADDRESS,
-          collectModuleData,
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           '0'
         );
@@ -274,10 +403,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
-            collectModule: ZERO_ADDRESS,
-            collectModuleData: collectModuleData,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
+            collectModule: ZERO_ADDRESS,
+            collectModuleInitData: collectModuleInitData,
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -290,7 +420,8 @@ makeSuiteCleanRoom('Publishing Comments', function () {
 
       it('Testwallet should fail to comment with sig with invalid deadline', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
+        const collectModuleInitData = [];
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -298,10 +429,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           MOCK_URI,
           FIRST_PROFILE_ID,
           '1',
-          ZERO_ADDRESS,
-          collectModuleData,
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           '0'
         );
@@ -312,10 +444,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
-            collectModule: ZERO_ADDRESS,
-            collectModuleData: collectModuleData,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
+            collectModule: ZERO_ADDRESS,
+            collectModuleInitData: collectModuleInitData,
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -328,7 +461,8 @@ makeSuiteCleanRoom('Publishing Comments', function () {
 
       it('Testwallet should fail to comment with sig with invalid nonce', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
+        const collectModuleInitData = [];
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -336,10 +470,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           MOCK_URI,
           FIRST_PROFILE_ID,
           '1',
-          ZERO_ADDRESS,
-          collectModuleData,
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce + 1,
           MAX_UINT256
         );
@@ -350,10 +485,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
-            collectModule: ZERO_ADDRESS,
-            collectModuleData: collectModuleData,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
+            collectModule: ZERO_ADDRESS,
+            collectModuleInitData: collectModuleInitData,
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -366,7 +502,8 @@ makeSuiteCleanRoom('Publishing Comments', function () {
 
       it('Testwallet should fail to comment with sig with unwhitelisted collect module', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
+        const collectModuleInitData = [];
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -374,10 +511,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           MOCK_URI,
           FIRST_PROFILE_ID,
           '1',
-          userAddress,
-          collectModuleData,
-          ZERO_ADDRESS,
           referenceModuleData,
+          userAddress,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -388,10 +526,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
-            collectModule: userAddress,
-            collectModuleData: collectModuleData,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
+            collectModule: userAddress,
+            collectModuleInitData: collectModuleInitData,
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -408,7 +547,8 @@ makeSuiteCleanRoom('Publishing Comments', function () {
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = abiCoder.encode(['bool'], [true]);
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -416,10 +556,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           MOCK_URI,
           FIRST_PROFILE_ID,
           '1',
-          freeCollectModule.address,
-          collectModuleData,
-          mockReferenceModule.address,
           referenceModuleData,
+          freeCollectModule.address,
+          collectModuleInitData,
+          mockReferenceModule.address,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -430,10 +571,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+            referenceModuleData,
             collectModule: freeCollectModule.address,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: mockReferenceModule.address,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -450,7 +592,8 @@ makeSuiteCleanRoom('Publishing Comments', function () {
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = abiCoder.encode(['bool'], [true]);
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -458,10 +601,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           OTHER_MOCK_URI,
           FIRST_PROFILE_ID,
           '3',
-          freeCollectModule.address,
-          collectModuleData,
-          ZERO_ADDRESS,
           referenceModuleData,
+          freeCollectModule.address,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -472,10 +616,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: OTHER_MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '3',
-            collectModule: freeCollectModule.address,
-            collectModuleData: collectModuleData,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
+            collectModule: freeCollectModule.address,
+            collectModuleInitData: collectModuleInitData,
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -492,18 +637,19 @@ makeSuiteCleanRoom('Publishing Comments', function () {
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
+        const collectModuleInitData = [];
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
         const { v, r, s } = await getCommentWithSigParts(
           FIRST_PROFILE_ID,
           OTHER_MOCK_URI,
           FIRST_PROFILE_ID,
           '2',
-          freeCollectModule.address,
-          collectModuleData,
-          ZERO_ADDRESS,
           referenceModuleData,
+          freeCollectModule.address,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -514,10 +660,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: OTHER_MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '2',
-            collectModule: freeCollectModule.address,
-            collectModuleData: collectModuleData,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
+            collectModule: freeCollectModule.address,
+            collectModuleInitData: collectModuleInitData,
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -534,7 +681,8 @@ makeSuiteCleanRoom('Publishing Comments', function () {
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = abiCoder.encode(['bool'], [true]);
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -542,10 +690,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           OTHER_MOCK_URI,
           FIRST_PROFILE_ID,
           '1',
-          freeCollectModule.address,
-          collectModuleData,
-          ZERO_ADDRESS,
           referenceModuleData,
+          freeCollectModule.address,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -558,10 +707,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: OTHER_MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
-            collectModule: freeCollectModule.address,
-            collectModuleData: collectModuleData,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
+            collectModule: freeCollectModule.address,
+            collectModuleInitData: collectModuleInitData,
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -580,7 +730,8 @@ makeSuiteCleanRoom('Publishing Comments', function () {
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = abiCoder.encode(['bool'], [true]);
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -588,10 +739,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
           OTHER_MOCK_URI,
           FIRST_PROFILE_ID,
           '1',
-          freeCollectModule.address,
-          collectModuleData,
-          ZERO_ADDRESS,
           referenceModuleData,
+          freeCollectModule.address,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -602,10 +754,11 @@ makeSuiteCleanRoom('Publishing Comments', function () {
             contentURI: OTHER_MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
-            collectModule: freeCollectModule.address,
-            collectModuleData: collectModuleData,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
+            collectModule: freeCollectModule.address,
+            collectModuleInitData: collectModuleInitData,
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
