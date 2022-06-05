@@ -18,7 +18,10 @@ export const ERRORS = {
   PUBLICATION_DOES_NOT_EXIST: 'PublicationDoesNotExist()',
   PROFILE_HANDLE_TAKEN: 'HandleTaken()',
   INVALID_HANDLE_LENGTH: 'HandleLengthInvalid()',
+<<<<<<< HEAD
   INVALID_IMAGE_URI_LENGTH: 'ProfileImageURILengthInvalid()',
+=======
+>>>>>>> dd137b2 (Initial commit)
   HANDLE_CONTAINS_INVALID_CHARACTERS: 'HandleContainsInvalidCharacters()',
   NOT_FOLLOW_NFT: 'CallerNotFollowNFT()',
   NOT_COLLECT_NFT: 'CallerNotCollectNFT()',
@@ -32,12 +35,18 @@ export const ERRORS = {
   MODULE_DATA_MISMATCH: 'ModuleDataMismatch()',
   FOLLOW_NOT_APPROVED: 'FollowNotApproved()',
   ARRAY_MISMATCH: 'ArrayMismatch()',
+<<<<<<< HEAD
   CANNOT_COMMENT_ON_SELF: 'CannotCommentOnSelf',
+=======
+>>>>>>> dd137b2 (Initial commit)
   ERC721_NOT_OWN: 'ERC721: transfer of token that is not own',
   ERC721_TRANSFER_NOT_OWNER_OR_APPROVED: 'ERC721: transfer caller is not owner nor approved',
   ERC721_QUERY_FOR_NONEXISTENT_TOKEN: 'ERC721: owner query for nonexistent token',
   ERC20_TRANSFER_EXCEEDS_ALLOWANCE: 'ERC20: transfer amount exceeds allowance',
+<<<<<<< HEAD
   ERC20_INSUFFICIENT_ALLOWANCE: 'ERC20: insufficient allowance',
+=======
+>>>>>>> dd137b2 (Initial commit)
   NO_SELECTOR:
     "Transaction reverted: function selector was not recognized and there's no fallback function",
   PAUSED: 'Paused()',

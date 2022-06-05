@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ```                                                                                                                       
      &&&&&                        &&&&&&&&&&&&&&&&&&&&&&&&     &&&&&&&&&&              &&&&&         /&&&&&&&&&&&&&&&&&           
      &&&&&                        &&&&&&&&&&&&&&&&&&&&&&&&     &&&&  &&&&&             &&&&&       &&&&&&(        .&&&&&&*        
@@ -30,11 +31,38 @@
       | \_/  / \__    / \_   |        \   _/      |       _|         | \_/  / \__    / \_   |        \   _/      |       _|    
      /|\_  _/       _/\       \__     /\_        / \_      |_       /|\_  _/       _/\       \__     /\_        / \_      |_    
     / |     |        \___      \_     /\         \        /        / |     |        \___      \_     /\         \        /                         
+=======
+```
+          _____            _____                    _____                    _____          
+         /\    \          /\    \                  /\    \                  /\    \         
+        /::\____\        /::\    \                /::\____\                /::\    \        
+       /:::/    /       /::::\    \              /::::|   |               /::::\    \       
+      /:::/    /       /::::::\    \            /:::::|   |              /::::::\    \      
+     /:::/    /       /:::/\:::\    \          /::::::|   |             /:::/\:::\    \     
+    /:::/    /       /:::/__\:::\    \        /:::/|::|   |            /:::/__\:::\    \    
+   /:::/    /       /::::\   \:::\    \      /:::/ |::|   |            \:::\   \:::\    \   
+  /:::/    /       /::::::\   \:::\    \    /:::/  |::|   | _____    ___\:::\   \:::\    \  
+ /:::/    /       /:::/\:::\   \:::\    \  /:::/   |::|   |/\    \  /\   \:::\   \:::\    \ 
+/:::/____/       /:::/__\:::\   \:::\____\/:: /    |::|   /::\____\/::\   \:::\   \:::\____\
+\:::\    \       \:::\   \:::\   \::/    /\::/    /|::|  /:::/    /\:::\   \:::\   \::/    /
+ \:::\    \       \:::\   \:::\   \/____/  \/____/ |::| /:::/    /  \:::\   \:::\   \/____/ 
+  \:::\    \       \:::\   \:::\    \              |::|/:::/    /    \:::\   \:::\    \     
+   \:::\    \       \:::\   \:::\____\             |::::::/    /      \:::\   \:::\____\    
+    \:::\    \       \:::\   \::/    /             |:::::/    /        \:::\  /:::/    /    
+     \:::\    \       \:::\   \/____/              |::::/    /          \:::\/:::/    /     
+      \:::\    \       \:::\    \                  /:::/    /            \::::::/    /      
+       \:::\____\       \:::\____\                /:::/    /              \::::/    /       
+        \::/    /        \::/    /                \::/    /                \::/    /        
+         \/____/          \/____/                  \/____/                  \/____/         
+                                                                                            
+
+>>>>>>> dd137b2 (Initial commit)
 
 ```
 
 # Lens Protocol
 
+<<<<<<< HEAD
 The Lens Protocol is a decentralized, non-custodial social graph. Lens implements unique, on-chain social interaction mechanisms analogous to commonly understood Web2 social media interactions, but significantly expanded with unique functionality that empower communities to form and participants to own their own social graph.
 
 ## Setup
@@ -45,6 +73,12 @@ The Lens Protocol is a decentralized, non-custodial social graph. Lens implement
 >
 > (feel free to experiment and submit PR's)
 
+=======
+The Lens protocol is a decentralized, non-custodial social graph. Lens implements unique, on-chain social interaction mechanisms analogous to commonly understood Web2 social media interactions, but significantly expanded with unique functionality that empower communities to form and participants to own their own social graph.
+
+## Setup
+
+>>>>>>> dd137b2 (Initial commit)
 The environment is built using Docker Compose, note that your `.env` file must have an `ALCHEMY_KEY` or an `INFURA_KEY` variable, and an optional `MNEMONIC` and `ETHERSCAN_KEY`, defined like so:
 
 ```
@@ -56,14 +90,26 @@ ETHERSCAN_KEY="YOUR ETHERSCAN API KEY HERE"
 
 With the environment file set up, you can move on to using Docker:
 
+<<<<<<< HEAD
 ```bash
 export USERID=$UID && docker-compose build && docker-compose run contracts-env bash
+=======
+```
+$ sudo docker-compose up
+```
+
+And in another terminal:
+
+```
+$ sudo docker-compose exec contracts-env bash
+>>>>>>> dd137b2 (Initial commit)
 ```
 
 From there, have fun!
 
 Here are a few self-explanatory scripts:
 
+<<<<<<< HEAD
 ```bash
 npm run test
 npm run coverage
@@ -74,11 +120,21 @@ Cleanup leftover Docker containers:
 
 ```bash
 USERID=$UID docker-compose down
+=======
+```
+$ npm run test
+$ npm run coverage
+$ npm run compile
+>>>>>>> dd137b2 (Initial commit)
 ```
 
 ## Protocol Overview
 
+<<<<<<< HEAD
 The Lens Protocol transfers ownership of social graphs to the participants of that graph themselves. This is achieved by creating direct links between `profiles` and their `followers`, while allowing fine-grained control of additional logic, including monetization, to be executed during those interactions on a profile-by-profile basis.
+=======
+The Lens protocol transfers ownership of social graphs to the participants of that graph themselves. This is achieved by creating direct links between `profiles` and their `followers`, while allowing fine-grained control of additional logic, including monetization, to be executed during those interactions on a profile-by-profile basis.
+>>>>>>> dd137b2 (Initial commit)
 
 Here's how it works...
 
@@ -155,7 +211,11 @@ This is a publication type that points back to another publication, whether it b
 This is a publication type that points to another publication, note that mirrors cannot, themselves, be mirrored (doing so instead mirrors the pointed content). Mirrors have no original content of its own. Akin to a "share" on traditional social media. Mirrors contain:
 
 1. An empty URI, since they cannot have content associated with them.
+<<<<<<< HEAD
 2. An initialized pointer, containing the profile ID and the publication ID of the mirrored publication.
+=======
+2. An initialized pointer, contianing the profile ID and the publication ID of the mirrored publication.
+>>>>>>> dd137b2 (Initial commit)
 
 ### Profile Interaction
 
@@ -179,7 +239,11 @@ Alright, that was a mouthful! Let's move on to more specific details about Lens'
 
 Stepping back for a moment, the core concept behind modules is to allow as much freedom as possible to the community to come up with new, innovative interaction mechanisms between social graph participants. For security purposes, this is achieved by including a whitelisted list of modules controlled by governance.
 
+<<<<<<< HEAD
 To recap, the Lens Protocol has three types of modules:
+=======
+To recap, the Lens protocol has three modules:
+>>>>>>> dd137b2 (Initial commit)
 
 1. `Follow Modules` contain custom logic to be executed upon follow.
 2. `Collect Modules` contain custom logic to be executed upon collect. Typically, these modules include at least a check that the collector is a follower.
@@ -191,6 +255,10 @@ Lastly, there is also a `ModuleGlobals` contract which acts as a central data pr
 
 ### Upgradeability
 
+<<<<<<< HEAD
 This iteration of the Lens Protocol implements a transparent upgradeable proxy for the central hub to be controlled by governance. There are no other aspects of the protocol that are upgradeable. In an ideal world, the hub will not require upgrades due to the system's inherent modularity and openness, upgradeability is there only to implement new, breaking changes that would be impossible, or unreasonable to implement otherwise.
+=======
+This iteration of the Lens protocol implements a transparent upgradeable proxy for the central hub to be controlled by governance. There are no other aspects of the protocol that are upgradeable. In an ideal world, the hub will not require upgrades due to the system's inherent modularity and openness, upgradeability is there only to implement new, breaking changes that would be impossible, or unreasonable to implement otherwise.
+>>>>>>> dd137b2 (Initial commit)
 
 This does come with a few caveats, for instance, the `ModuleGlobals` contract implements a currency whitelist, but it is not upgradeable, so the "removal" of a currency whitelist in a module would require a specific new module that does not query the `ModuleGlobals` contract for whitelisted currencies.

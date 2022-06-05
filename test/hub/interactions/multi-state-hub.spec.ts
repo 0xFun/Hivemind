@@ -15,7 +15,11 @@ import {
   ProtocolState,
 } from '../../helpers/utils';
 import {
+<<<<<<< HEAD
   freeCollectModule,
+=======
+  emptyCollectModule,
+>>>>>>> dd137b2 (Initial commit)
   FIRST_PROFILE_ID,
   governance,
   lensHub,
@@ -27,7 +31,10 @@ import {
   testWallet,
   userAddress,
   userTwoAddress,
+<<<<<<< HEAD
   abiCoder,
+=======
+>>>>>>> dd137b2 (Initial commit)
 } from '../../__setup.spec';
 
 makeSuiteCleanRoom('Multi-State Hub', function () {
@@ -97,6 +104,7 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
 
   context('Paused State', function () {
     context('Scenarios', async function () {
+<<<<<<< HEAD
       it('User should create a profile, governance should pause the hub, transferring the profile should fail', async function () {
         await expect(
           lensHub.createProfile({
@@ -115,6 +123,8 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
           lensHub.transferFrom(userAddress, userTwoAddress, FIRST_PROFILE_ID)
         ).to.be.revertedWith(ERRORS.PAUSED);
       });
+=======
+>>>>>>> dd137b2 (Initial commit)
       it('Governance should pause the hub, profile creation should fail, then governance unpauses the hub and profile creation should work', async function () {
         await expect(lensHub.connect(governance).setState(ProtocolState.Paused)).to.not.be.reverted;
 
@@ -478,19 +488,32 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         await expect(lensHub.connect(governance).setState(ProtocolState.Paused)).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
         ).to.be.revertedWith(ERRORS.PUBLISHING_PAUSED);
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleData: [],
+          })
+        ).to.be.revertedWith(ERRORS.PAUSED);
+>>>>>>> dd137b2 (Initial commit)
 
         await expect(
           lensHub.connect(governance).setState(ProtocolState.Unpaused)
@@ -500,8 +523,13 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -523,17 +551,29 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         await expect(lensHub.connect(governance).setState(ProtocolState.Paused)).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
         const collectModuleData = abiCoder.encode(['bool'], [true]);
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+        ).to.not.be.reverted;
+
+        const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const collectModuleData = [];
+>>>>>>> dd137b2 (Initial commit)
         const referenceModuleData = [];
 
         const { v, r, s } = await getPostWithSigParts(
           FIRST_PROFILE_ID,
           MOCK_URI,
+<<<<<<< HEAD
           freeCollectModule.address,
+=======
+          emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
           collectModuleData,
           ZERO_ADDRESS,
           referenceModuleData,
@@ -545,7 +585,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
           lensHub.postWithSig({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
+=======
+            collectModule: emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
             collectModuleData: collectModuleData,
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
@@ -556,7 +600,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
               deadline: MAX_UINT256,
             },
           })
+<<<<<<< HEAD
         ).to.be.revertedWith(ERRORS.PUBLISHING_PAUSED);
+=======
+        ).to.be.revertedWith(ERRORS.PAUSED);
+>>>>>>> dd137b2 (Initial commit)
 
         await expect(
           lensHub.connect(governance).setState(ProtocolState.Unpaused)
@@ -566,7 +614,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
           lensHub.postWithSig({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
+=======
+            collectModule: emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
             collectModuleData: collectModuleData,
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
@@ -593,15 +645,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -615,12 +676,21 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
         ).to.be.revertedWith(ERRORS.PUBLISHING_PAUSED);
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleData: [],
+          })
+        ).to.be.revertedWith(ERRORS.PAUSED);
+>>>>>>> dd137b2 (Initial commit)
 
         await expect(
           lensHub.connect(governance).setState(ProtocolState.Unpaused)
@@ -632,8 +702,13 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -653,15 +728,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.connect(testWallet).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -670,7 +754,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         await expect(lensHub.connect(governance).setState(ProtocolState.Paused)).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+<<<<<<< HEAD
         const collectModuleData = abiCoder.encode(['bool'], [true]);
+=======
+        const collectModuleData = [];
+>>>>>>> dd137b2 (Initial commit)
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -678,7 +766,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
           MOCK_URI,
           FIRST_PROFILE_ID,
           '1',
+<<<<<<< HEAD
           freeCollectModule.address,
+=======
+          emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
           collectModuleData,
           ZERO_ADDRESS,
           referenceModuleData,
@@ -692,7 +784,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
+=======
+            collectModule: emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
             collectModuleData: collectModuleData,
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
@@ -703,7 +799,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
               deadline: MAX_UINT256,
             },
           })
+<<<<<<< HEAD
         ).to.be.revertedWith(ERRORS.PUBLISHING_PAUSED);
+=======
+        ).to.be.revertedWith(ERRORS.PAUSED);
+>>>>>>> dd137b2 (Initial commit)
 
         await expect(
           lensHub.connect(governance).setState(ProtocolState.Unpaused)
@@ -715,7 +815,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
+=======
+            collectModule: emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
             collectModuleData: collectModuleData,
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
@@ -742,15 +846,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -766,7 +879,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
+<<<<<<< HEAD
         ).to.be.revertedWith(ERRORS.PUBLISHING_PAUSED);
+=======
+        ).to.be.revertedWith(ERRORS.PAUSED);
+>>>>>>> dd137b2 (Initial commit)
 
         await expect(
           lensHub.connect(governance).setState(ProtocolState.Unpaused)
@@ -796,15 +913,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.connect(testWallet).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -839,7 +965,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
               deadline: MAX_UINT256,
             },
           })
+<<<<<<< HEAD
         ).to.be.revertedWith(ERRORS.PUBLISHING_PAUSED);
+=======
+        ).to.be.revertedWith(ERRORS.PAUSED);
+>>>>>>> dd137b2 (Initial commit)
 
         await expect(
           lensHub.connect(governance).setState(ProtocolState.Unpaused)
@@ -977,15 +1107,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1017,15 +1156,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.connect(testWallet).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1296,15 +1444,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1318,8 +1475,13 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1343,17 +1505,29 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
         const collectModuleData = abiCoder.encode(['bool'], [true]);
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+        ).to.not.be.reverted;
+
+        const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const collectModuleData = [];
+>>>>>>> dd137b2 (Initial commit)
         const referenceModuleData = [];
 
         const { v, r, s } = await getPostWithSigParts(
           FIRST_PROFILE_ID,
           MOCK_URI,
+<<<<<<< HEAD
           freeCollectModule.address,
+=======
+          emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
           collectModuleData,
           ZERO_ADDRESS,
           referenceModuleData,
@@ -1365,7 +1539,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
           lensHub.postWithSig({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
+=======
+            collectModule: emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
             collectModuleData: collectModuleData,
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
@@ -1386,7 +1564,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
           lensHub.postWithSig({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
+=======
+            collectModule: emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
             collectModuleData: collectModuleData,
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
@@ -1413,15 +1595,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1437,8 +1628,13 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1454,8 +1650,13 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1475,15 +1676,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.connect(testWallet).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1494,7 +1704,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+<<<<<<< HEAD
         const collectModuleData = abiCoder.encode(['bool'], [true]);
+=======
+        const collectModuleData = [];
+>>>>>>> dd137b2 (Initial commit)
         const referenceModuleData = [];
 
         const { v, r, s } = await getCommentWithSigParts(
@@ -1502,7 +1716,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
           MOCK_URI,
           FIRST_PROFILE_ID,
           '1',
+<<<<<<< HEAD
           freeCollectModule.address,
+=======
+          emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
           collectModuleData,
           ZERO_ADDRESS,
           referenceModuleData,
@@ -1516,7 +1734,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
+=======
+            collectModule: emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
             collectModuleData: collectModuleData,
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
@@ -1539,7 +1761,11 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
+=======
+            collectModule: emptyCollectModule.address,
+>>>>>>> dd137b2 (Initial commit)
             collectModuleData: collectModuleData,
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: referenceModuleData,
@@ -1566,15 +1792,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1622,15 +1857,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.connect(testWallet).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1781,15 +2025,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -1817,15 +2070,24 @@ makeSuiteCleanRoom('Multi-State Hub', function () {
         ).to.not.be.reverted;
 
         await expect(
+<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.connect(testWallet).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })

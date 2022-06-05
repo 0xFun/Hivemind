@@ -10,6 +10,7 @@ import {ERC721Time} from './ERC721Time.sol';
 import {ERC721Enumerable} from './ERC721Enumerable.sol';
 
 abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
+<<<<<<< HEAD
     bytes32 internal constant EIP712_REVISION_HASH = keccak256('1');
     bytes32 internal constant PERMIT_TYPEHASH =
         keccak256('Permit(address spender,uint256 tokenId,uint256 nonce,uint256 deadline)');
@@ -23,6 +24,27 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
         keccak256(
             'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
         );
+=======
+    bytes32 internal constant EIP712_REVISION_HASH =
+        0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
+    // keccak256('1');
+    bytes32 internal constant PERMIT_TYPEHASH =
+        0x49ecf333e5b8c95c40fdafc95c1ad136e8914a8fb55e9dc8bb01eaa83a2df9ad;
+    // keccak256('Permit(address spender,uint256 tokenId,uint256 nonce,uint256 deadline)');
+    bytes32 internal constant PERMIT_FOR_ALL_TYPEHASH =
+        0x47ab88482c90e4bb94b82a947ae78fa91fb25de1469ab491f4c15b9a0a2677ee;
+    // keccak256(
+    // 'PermitForAll(address owner,address operator,bool approved,uint256 nonce,uint256 deadline)'
+    // );
+    bytes32 internal constant BURN_WITH_SIG_TYPEHASH =
+        0x108ccda6d7331b00561a3eea66a2ae331622356585681c62731e4a01aae2261a;
+    // keccak256('BurnWithSig(uint256 tokenId,uint256 nonce,uint256 deadline)');
+    bytes32 internal constant EIP712_DOMAIN_TYPEHASH =
+        0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
+    // keccak256(
+    // 'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
+    // )
+>>>>>>> dd137b2 (Initial commit)
 
     mapping(address => uint256) public sigNonces;
 
@@ -49,6 +71,7 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
     ) external override {
         if (spender == address(0)) revert Errors.ZeroSpender();
         address owner = ownerOf(tokenId);
+<<<<<<< HEAD
         _validateRecoveredAddress(
             _calculateDigest(
                 keccak256(
@@ -58,6 +81,29 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
             owner,
             sig
         );
+=======
+
+        bytes32 digest;
+        unchecked {
+            digest = keccak256(
+                abi.encodePacked(
+                    '\x19\x01',
+                    _calculateDomainSeparator(),
+                    keccak256(
+                        abi.encode(
+                            PERMIT_TYPEHASH,
+                            spender,
+                            tokenId,
+                            sigNonces[owner]++,
+                            sig.deadline
+                        )
+                    )
+                )
+            );
+        }
+
+        _validateRecoveredAddress(digest, owner, sig);
+>>>>>>> dd137b2 (Initial commit)
         _approve(spender, tokenId);
     }
 
@@ -69,6 +115,7 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
         DataTypes.EIP712Signature calldata sig
     ) external override {
         if (operator == address(0)) revert Errors.ZeroSpender();
+<<<<<<< HEAD
         _validateRecoveredAddress(
             _calculateDigest(
                 keccak256(
@@ -85,6 +132,30 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
             owner,
             sig
         );
+=======
+
+        bytes32 digest;
+        unchecked {
+            digest = keccak256(
+                abi.encodePacked(
+                    '\x19\x01',
+                    _calculateDomainSeparator(),
+                    keccak256(
+                        abi.encode(
+                            PERMIT_FOR_ALL_TYPEHASH,
+                            owner,
+                            operator,
+                            approved,
+                            sigNonces[owner]++,
+                            sig.deadline
+                        )
+                    )
+                )
+            );
+        }
+
+        _validateRecoveredAddress(digest, owner, sig);
+>>>>>>> dd137b2 (Initial commit)
         _setOperatorApproval(owner, operator, approved);
     }
 
@@ -107,6 +178,7 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
     {
         address owner = ownerOf(tokenId);
 
+<<<<<<< HEAD
         _validateRecoveredAddress(
             _calculateDigest(
                 keccak256(
@@ -116,6 +188,27 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
             owner,
             sig
         );
+=======
+        bytes32 digest;
+        unchecked {
+            digest = keccak256(
+                abi.encodePacked(
+                    '\x19\x01',
+                    _calculateDomainSeparator(),
+                    keccak256(
+                        abi.encode(
+                            BURN_WITH_SIG_TYPEHASH,
+                            tokenId,
+                            sigNonces[owner]++,
+                            sig.deadline
+                        )
+                    )
+                )
+            );
+        }
+
+        _validateRecoveredAddress(digest, owner, sig);
+>>>>>>> dd137b2 (Initial commit)
         _burn(tokenId);
     }
 
@@ -125,7 +218,11 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
     function _validateRecoveredAddress(
         bytes32 digest,
         address expectedAddress,
+<<<<<<< HEAD
         DataTypes.EIP712Signature calldata sig
+=======
+        DataTypes.EIP712Signature memory sig
+>>>>>>> dd137b2 (Initial commit)
     ) internal view {
         if (sig.deadline < block.timestamp) revert Errors.SignatureExpired();
         address recoveredAddress = ecrecover(digest, sig.v, sig.r, sig.s);
@@ -148,6 +245,7 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
                 )
             );
     }
+<<<<<<< HEAD
 
     /**
      * @dev Calculates EIP712 digest based on the current DOMAIN_SEPARATOR.
@@ -165,4 +263,6 @@ abstract contract LensNFTBase is ILensNFTBase, ERC721Enumerable {
         }
         return digest;
     }
+=======
+>>>>>>> dd137b2 (Initial commit)
 }

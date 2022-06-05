@@ -2,11 +2,15 @@ version: '3.5'
 
 services:
   contracts-env:
+<<<<<<< HEAD
     user: "${USERID?}:${USERID?}"
+=======
+>>>>>>> dd137b2 (Initial commit)
     env_file:
       - .env
     build:
       context: ./
+<<<<<<< HEAD
     stdin_open: true
     tty: true
     volumes:
@@ -22,3 +26,20 @@ services:
       #- ALCHEMY_KEY=
       #- TENDERLY_FORK_ID=
       #- TENDERLY_HEAD_ID=
+=======
+    working_dir: /src
+    command: npm run run-env
+    volumes:
+      - ./:/src
+      - $HOME/.tenderly/config.yaml:/root/.tenderly/config.yaml
+    environment:
+      MNEMONIC: ${MNEMONIC}
+      ETHERSCAN_KEY: ${ETHERSCAN_KEY}
+      INFURA_KEY: ${INFURA_KEY}
+      ETHERSCAN_NETWORK: ${ETHERSCAN_NETWORK}
+      TENDERLY_PROJECT: ${TENDERLY_PROJECT}
+      TENDERLY_USERNAME: ${TENDERLY_USERNAME}
+      ALCHEMY_KEY: ${ALCHEMY_KEY}
+      TENDERLY_FORK_ID: ${TENDERLY_FORK_ID}
+      TENDERLY_HEAD_ID: ${TENDERLY_HEAD_ID}
+>>>>>>> dd137b2 (Initial commit)

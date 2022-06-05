@@ -6,7 +6,11 @@ import {DataTypes} from '../libraries/DataTypes.sol';
 
 /**
  * @title IFollowNFT
+<<<<<<< HEAD
  * @author Lens Protocol
+=======
+ * @author Lens
+>>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is the interface for the FollowNFT contract, which is cloned upon the first follow for any profile.
  */
@@ -58,6 +62,7 @@ interface IFollowNFT {
      *
      * @param user The user to query governance power for.
      * @param blockNumber The block number to query the user's governance power at.
+<<<<<<< HEAD
      *
      * @return uint256 The power of the given user at the given block number.
      */
@@ -72,4 +77,8 @@ interface IFollowNFT {
      * @return uint256 The delegated supply at the given block number.
      */
     function getDelegatedSupplyByBlockNumber(uint256 blockNumber) external returns (uint256);
+=======
+     */
+    function getPowerByBlockNumber(address user, uint256 blockNumber) external returns (uint256);
+>>>>>>> dd137b2 (Initial commit)
 }

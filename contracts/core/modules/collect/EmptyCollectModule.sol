@@ -3,21 +3,20 @@
 pragma solidity 0.8.10;
 
 import {ICollectModule} from '../../../interfaces/ICollectModule.sol';
-import {Errors} from '../../../libraries/Errors.sol';
+import {ModuleBase} from '../ModuleBase.sol';
+import {FollowValidationModuleBase} from '../FollowValidationModuleBase.sol';
 
 /**
- * @title RevertCollectModule
-<<<<<<< HEAD
- * @author Lens Protocol
-=======
+ * @title EmptyCollectModule
  * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is a simple Lens CollectModule implementation, inheriting from the ICollectModule interface.
  *
- * This module works by disallowing all collects.
+ * This module works by allowing all collects by followers.
  */
-contract RevertCollectModule is ICollectModule {
+contract EmptyCollectModule is ICollectModule, FollowValidationModuleBase {
+    constructor(address hub) ModuleBase(hub) {}
+
     /**
      * @dev There is nothing needed at initialization.
      */
@@ -31,7 +30,7 @@ contract RevertCollectModule is ICollectModule {
 
     /**
      * @dev Processes a collect by:
-     *  1. Always reverting
+     *  1. Ensuring the collector is a follower
      */
     function processCollect(
         uint256 referrerProfileId,
@@ -39,7 +38,7 @@ contract RevertCollectModule is ICollectModule {
         uint256 profileId,
         uint256 pubId,
         bytes calldata data
-    ) external pure override {
-        revert Errors.CollectNotAllowed();
+    ) external view override {
+        _checkFollowValidity(profileId, collector);
     }
 }

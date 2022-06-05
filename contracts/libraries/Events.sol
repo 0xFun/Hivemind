@@ -124,7 +124,10 @@ library Events {
      * @param followModule The profile's newly set follow module. This CAN be the zero address.
      * @param followModuleReturnData The data returned from the follow module's initialization. This is abi encoded
      * and totally depends on the follow module chosen.
+<<<<<<< HEAD
      * @param followNFTURI The URI set for the profile's follow NFT.
+=======
+>>>>>>> dd137b2 (Initial commit)
      * @param timestamp The current block timestamp.
      */
     event ProfileCreated(
@@ -140,6 +143,7 @@ library Events {
     );
 
     /**
+<<<<<<< HEAD
      * @dev Emitted when a a default profile is set for a wallet as its main identity
      *
      * @param wallet The wallet which set or unset its default profile.
@@ -149,6 +153,8 @@ library Events {
     event DefaultProfileSet(address indexed wallet, uint256 indexed profileId, uint256 timestamp);
 
     /**
+=======
+>>>>>>> dd137b2 (Initial commit)
      * @dev Emitted when a dispatcher is set for a specific profile.
      *
      * @param profileId The token ID of the profile for which the dispatcher is set.
@@ -281,6 +287,18 @@ library Events {
     );
 
     /**
+<<<<<<< HEAD
+=======
+     * @dev Emitted upon a successful follow action.
+     *
+     * @param follower The address following the profile.
+     * @param profileIds The profile token ID array of the profiles being followed.
+     * @param timestamp The current block timestamp.
+     */
+    event Followed(address indexed follower, uint256[] profileIds, uint256 timestamp);
+
+    /**
+>>>>>>> dd137b2 (Initial commit)
      * @dev Emitted when a collectNFT clone is deployed using a lazy deployment pattern.
      *
      * @param profileId The publisher's profile token ID.
@@ -358,7 +376,11 @@ library Events {
      * @param profileId The token ID of the profile connected to this follow NFT.
      * @param timestamp The current block timestamp.
      */
+<<<<<<< HEAD
     event FollowNFTInitialized(uint256 indexed profileId, uint256 timestamp);
+=======
+    event FollowNFTInitialized(uint256 profileId, uint256 timestamp);
+>>>>>>> dd137b2 (Initial commit)
 
     /**
      * @dev Emitted when delegation power in a FollowNFT is changed.
@@ -367,11 +389,15 @@ library Events {
      * @param newPower The new governance power mapped to the delegate.
      * @param timestamp The current block timestamp.
      */
+<<<<<<< HEAD
     event FollowNFTDelegatedPowerChanged(
         address indexed delegate,
         uint256 indexed newPower,
         uint256 timestamp
     );
+=======
+    event FollowNFTDelegatedPowerChanged(address delegate, uint256 newPower, uint256 timestamp);
+>>>>>>> dd137b2 (Initial commit)
 
     /**
      * @dev Emitted when a newly deployed collect NFT is initialized.
@@ -380,11 +406,15 @@ library Events {
      * @param pubId The publication ID connected to the publication mapped to this collect NFT.
      * @param timestamp The current block timestamp.
      */
+<<<<<<< HEAD
     event CollectNFTInitialized(
         uint256 indexed profileId,
         uint256 indexed pubId,
         uint256 timestamp
     );
+=======
+    event CollectNFTInitialized(uint256 profileId, uint256 pubId, uint256 timestamp);
+>>>>>>> dd137b2 (Initial commit)
 
     // Module-Specific
 
@@ -475,6 +505,7 @@ library Events {
         bool[] approved,
         uint256 timestamp
     );
+<<<<<<< HEAD
 
     /**
      * @dev Emitted when the user wants to enable or disable the follow.
@@ -490,4 +521,6 @@ library Events {
         bool[] enabled,
         uint256 timestamp
     );
+=======
+>>>>>>> dd137b2 (Initial commit)
 }

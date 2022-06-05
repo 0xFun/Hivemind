@@ -11,8 +11,13 @@ import {
   CollectNFT__factory,
   Currency,
   Currency__factory,
+<<<<<<< HEAD
   FreeCollectModule,
   FreeCollectModule__factory,
+=======
+  EmptyCollectModule,
+  EmptyCollectModule__factory,
+>>>>>>> dd137b2 (Initial commit)
   Events,
   Events__factory,
   FeeCollectModule,
@@ -37,15 +42,21 @@ import {
   MockReferenceModule__factory,
   ModuleGlobals,
   ModuleGlobals__factory,
+<<<<<<< HEAD
   ProfileTokenURILogic__factory,
+=======
+>>>>>>> dd137b2 (Initial commit)
   PublishingLogic__factory,
   RevertCollectModule,
   RevertCollectModule__factory,
   TimedFeeCollectModule,
   TimedFeeCollectModule__factory,
   TransparentUpgradeableProxy__factory,
+<<<<<<< HEAD
   LensPeriphery,
   LensPeriphery__factory,
+=======
+>>>>>>> dd137b2 (Initial commit)
 } from '../typechain-types';
 import { LensHubLibraryAddresses } from '../typechain-types/factories/LensHub__factory';
 import { FAKE_PRIVATEKEY, ZERO_ADDRESS } from './helpers/constants';
@@ -62,6 +73,7 @@ export const CURRENCY_MINT_AMOUNT = parseEther('100');
 export const BPS_MAX = 10000;
 export const TREASURY_FEE_BPS = 50;
 export const REFERRAL_FEE_BPS = 250;
+<<<<<<< HEAD
 export const MAX_PROFILE_IMAGE_URI_LENGTH = 6000;
 export const LENS_HUB_NFT_NAME = 'Lens Profiles';
 export const LENS_HUB_NFT_SYMBOL = 'LENS';
@@ -74,17 +86,37 @@ export const MOCK_PROFILE_URI =
   'https://ipfs.io/ipfs/Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu';
 export const MOCK_FOLLOW_NFT_URI =
   'https://ipfs.fleek.co/ipfs/ghostplantghostplantghostplantghostplantghostplantghostplan';
+=======
+export const LENS_HUB_NFT_NAME = 'Lens Profiles';
+export const LENS_HUB_NFT_SYMBOL = 'LENS';
+export const MOCK_PROFILE_HANDLE = 'plant1ghost.eth';
+export const FIRST_PROFILE_ID = 1;
+export const MOCK_URI =
+  'https://ipfs.fleek.co/ipfs/plantghostplantghostplantghostplantghostplantghostplantghos';
+export const OTHER_MOCK_URI =
+  'https://ipfs.fleek.co/ipfs/ghostplantghostplantghostplantghostplantghostplantghostplan';
+export const MOCK_PROFILE_URI =
+  'https://ipfs.fleek.co/ipfs/runningoutofthingstowriterunningoutofthingstowriterunningou';
+export const MOCK_FOLLOW_NFT_URI =
+  'https://ipfs.fleek.co/ipfs/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+>>>>>>> dd137b2 (Initial commit)
 
 export let accounts: Signer[];
 export let deployer: Signer;
 export let user: Signer;
 export let userTwo: Signer;
+<<<<<<< HEAD
 export let userThree: Signer;
+=======
+>>>>>>> dd137b2 (Initial commit)
 export let governance: Signer;
 export let deployerAddress: string;
 export let userAddress: string;
 export let userTwoAddress: string;
+<<<<<<< HEAD
 export let userThreeAddress: string;
+=======
+>>>>>>> dd137b2 (Initial commit)
 export let governanceAddress: string;
 export let followNFTImplAddress: string;
 export let collectNFTImplAddress: string;
@@ -99,14 +131,21 @@ export let hubLibs: LensHubLibraryAddresses;
 export let eventsLib: Events;
 export let moduleGlobals: ModuleGlobals;
 export let helper: Helper;
+<<<<<<< HEAD
 export let lensPeriphery: LensPeriphery;
+=======
+>>>>>>> dd137b2 (Initial commit)
 
 /* Modules */
 
 // Collect
 export let feeCollectModule: FeeCollectModule;
 export let timedFeeCollectModule: TimedFeeCollectModule;
+<<<<<<< HEAD
 export let freeCollectModule: FreeCollectModule;
+=======
+export let emptyCollectModule: EmptyCollectModule;
+>>>>>>> dd137b2 (Initial commit)
 export let revertCollectModule: RevertCollectModule;
 export let limitedFeeCollectModule: LimitedFeeCollectModule;
 export let limitedTimedFeeCollectModule: LimitedTimedFeeCollectModule;
@@ -139,6 +178,7 @@ before(async function () {
   deployer = accounts[0];
   user = accounts[1];
   userTwo = accounts[2];
+<<<<<<< HEAD
   userThree = accounts[4];
   governance = accounts[3];
 
@@ -146,6 +186,12 @@ before(async function () {
   userAddress = await user.getAddress();
   userTwoAddress = await userTwo.getAddress();
   userThreeAddress = await userThree.getAddress();
+=======
+  governance = accounts[3];
+  deployerAddress = await deployer.getAddress();
+  userAddress = await user.getAddress();
+  userTwoAddress = await userTwo.getAddress();
+>>>>>>> dd137b2 (Initial commit)
   governanceAddress = await governance.getAddress();
   treasuryAddress = await accounts[4].getAddress();
   mockModuleData = abiCoder.encode(['uint256'], [1]);
@@ -158,12 +204,18 @@ before(async function () {
   );
   const publishingLogic = await new PublishingLogic__factory(deployer).deploy();
   const interactionLogic = await new InteractionLogic__factory(deployer).deploy();
+<<<<<<< HEAD
   const profileTokenURILogic = await new ProfileTokenURILogic__factory(deployer).deploy();
   hubLibs = {
     'contracts/libraries/PublishingLogic.sol:PublishingLogic': publishingLogic.address,
     'contracts/libraries/InteractionLogic.sol:InteractionLogic': interactionLogic.address,
     'contracts/libraries/ProfileTokenURILogic.sol:ProfileTokenURILogic':
       profileTokenURILogic.address,
+=======
+  hubLibs = {
+    'contracts/libraries/PublishingLogic.sol:PublishingLogic': publishingLogic.address,
+    'contracts/libraries/InteractionLogic.sol:InteractionLogic': interactionLogic.address,
+>>>>>>> dd137b2 (Initial commit)
   };
 
   // Here, we pre-compute the nonces and addresses used to deploy the contracts.
@@ -197,16 +249,23 @@ before(async function () {
   // Connect the hub proxy to the LensHub factory and the user for ease of use.
   lensHub = LensHub__factory.connect(proxy.address, user);
 
+<<<<<<< HEAD
   // LensPeriphery
   lensPeriphery = await new LensPeriphery__factory(deployer).deploy(
     lensHub.address
   );
 
+=======
+>>>>>>> dd137b2 (Initial commit)
   // Currency
   currency = await new Currency__factory(deployer).deploy();
 
   // Modules
+<<<<<<< HEAD
   freeCollectModule = await new FreeCollectModule__factory(deployer).deploy(lensHub.address);
+=======
+  emptyCollectModule = await new EmptyCollectModule__factory(deployer).deploy(lensHub.address);
+>>>>>>> dd137b2 (Initial commit)
   revertCollectModule = await new RevertCollectModule__factory(deployer).deploy();
   feeCollectModule = await new FeeCollectModule__factory(deployer).deploy(
     lensHub.address,
@@ -245,9 +304,12 @@ before(async function () {
     lensHub.connect(governance).whitelistProfileCreator(userTwoAddress, true)
   ).to.not.be.reverted;
   await expect(
+<<<<<<< HEAD
     lensHub.connect(governance).whitelistProfileCreator(userThreeAddress, true)
   ).to.not.be.reverted;
   await expect(
+=======
+>>>>>>> dd137b2 (Initial commit)
     lensHub.connect(governance).whitelistProfileCreator(testWallet.address, true)
   ).to.not.be.reverted;
 

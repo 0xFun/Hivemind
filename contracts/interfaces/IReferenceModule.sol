@@ -4,7 +4,11 @@ pragma solidity 0.8.10;
 
 /**
  * @title IReferenceModule
+<<<<<<< HEAD
  * @author Lens Protocol
+=======
+ * @author Lens
+>>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is the standard interface for all Lens-compatible ReferenceModules.
  */
@@ -15,7 +19,11 @@ interface IReferenceModule {
      * @param pubId The associated publication's LensHub publication ID.
      * @param data Arbitrary data passed from the user to be decoded.
      *
+<<<<<<< HEAD
      * @return bytes An abi encoded byte array encapsulating the execution's state changes. This will be emitted by the
+=======
+     * @return An abi encoded byte array encapsulating the execution's state changes. This will be emitted by the
+>>>>>>> dd137b2 (Initial commit)
      * hub alongside the collect module's address and should be consumed by front ends.
      */
     function initializeReferenceModule(

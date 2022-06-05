@@ -24,12 +24,18 @@ library Errors {
     error HandleTaken();
     error HandleLengthInvalid();
     error HandleContainsInvalidCharacters();
+<<<<<<< HEAD
     error ProfileImageURILengthInvalid();
+=======
+>>>>>>> dd137b2 (Initial commit)
     error CallerNotFollowNFT();
     error CallerNotCollectNFT();
     error BlockNumberInvalid();
     error ArrayMismatch();
+<<<<<<< HEAD
     error CannotCommentOnSelf();
+=======
+>>>>>>> dd137b2 (Initial commit)
 
     // Module Errors
     error InitParamsInvalid();

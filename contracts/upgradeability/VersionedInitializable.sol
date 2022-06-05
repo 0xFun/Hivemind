@@ -17,7 +17,11 @@ import {Errors} from '../libraries/Errors.sol';
  *
  * This is slightly modified from [Aave's version.](https://github.com/aave/protocol-v2/blob/6a503eb0a897124d8b9d126c915ffdf3e88343a9/contracts/protocol/libraries/aave-upgradeability/VersionedInitializable.sol)
  *
+<<<<<<< HEAD
  * @author Lens Protocol, inspired by Aave's implementation, which is in turn inspired by OpenZeppelin's
+=======
+ * @author Lens, inspired by Aave's implementation, which is in turn inspired by OpenZeppelin's
+>>>>>>> dd137b2 (Initial commit)
  * Initializable contract
  */
 abstract contract VersionedInitializable {

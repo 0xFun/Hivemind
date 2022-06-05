@@ -54,8 +54,13 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
     context('Publication Creation', function () {
       it('user should fail to post with limited fee collect module using zero collect limit', async function () {
         const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
           [0, DEFAULT_COLLECT_PRICE, currency.address, userAddress, REFERRAL_FEE_BPS, true]
+=======
+          ['uint256', 'uint256', 'address', 'address', 'uint16'],
+          [0, DEFAULT_COLLECT_PRICE, currency.address, userAddress, REFERRAL_FEE_BPS]
+>>>>>>> dd137b2 (Initial commit)
         );
         await expect(
           lensHub.post({
@@ -71,14 +76,21 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
       it('user should fail to post with limited fee collect module using unwhitelisted currency', async function () {
         const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
+=======
+          ['uint256', 'uint256', 'address', 'address', 'uint16'],
+>>>>>>> dd137b2 (Initial commit)
           [
             DEFAULT_COLLECT_LIMIT,
             DEFAULT_COLLECT_PRICE,
             userTwoAddress,
             userAddress,
             REFERRAL_FEE_BPS,
+<<<<<<< HEAD
             true,
+=======
+>>>>>>> dd137b2 (Initial commit)
           ]
         );
         await expect(
@@ -95,14 +107,21 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
       it('user should fail to post with limited fee collect module using zero recipient', async function () {
         const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
+=======
+          ['uint256', 'uint256', 'address', 'address', 'uint16'],
+>>>>>>> dd137b2 (Initial commit)
           [
             DEFAULT_COLLECT_LIMIT,
             DEFAULT_COLLECT_PRICE,
             currency.address,
             ZERO_ADDRESS,
             REFERRAL_FEE_BPS,
+<<<<<<< HEAD
             true,
+=======
+>>>>>>> dd137b2 (Initial commit)
           ]
         );
         await expect(
@@ -119,8 +138,13 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
       it('user should fail to post with limited fee collect module using referral fee greater than max BPS', async function () {
         const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
           [DEFAULT_COLLECT_LIMIT, DEFAULT_COLLECT_PRICE, currency.address, userAddress, 10001, true]
+=======
+          ['uint256', 'uint256', 'address', 'address', 'uint16'],
+          [DEFAULT_COLLECT_LIMIT, DEFAULT_COLLECT_PRICE, currency.address, userAddress, 10001]
+>>>>>>> dd137b2 (Initial commit)
         );
         await expect(
           lensHub.post({
@@ -134,10 +158,17 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
       });
 
+<<<<<<< HEAD
       it('user should fail to post with limited fee collect module using zero amount', async function () {
         const collectModuleData = abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
           [DEFAULT_COLLECT_LIMIT, 0, currency.address, userAddress, REFERRAL_FEE_BPS, true]
+=======
+      it('user should fail to post with limited fee collect module using amount lower than max BPS', async function () {
+        const collectModuleData = abiCoder.encode(
+          ['uint256', 'uint256', 'address', 'address', 'uint16'],
+          [DEFAULT_COLLECT_LIMIT, 9999, currency.address, userAddress, REFERRAL_FEE_BPS]
+>>>>>>> dd137b2 (Initial commit)
         );
         await expect(
           lensHub.post({
@@ -155,14 +186,21 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
     context('Collecting', function () {
       beforeEach(async function () {
         const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
+=======
+          ['uint256', 'uint256', 'address', 'address', 'uint16'],
+>>>>>>> dd137b2 (Initial commit)
           [
             DEFAULT_COLLECT_LIMIT,
             DEFAULT_COLLECT_PRICE,
             currency.address,
             userAddress,
             REFERRAL_FEE_BPS,
+<<<<<<< HEAD
             true,
+=======
+>>>>>>> dd137b2 (Initial commit)
           ]
         );
         await expect(
@@ -177,6 +215,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
         ).to.not.be.reverted;
       });
 
+<<<<<<< HEAD
       it('Governance should set the treasury fee BPS to zero, userTwo collecting should not emit a transfer event to the treasury', async function () {
         await expect(moduleGlobals.connect(governance).setTreasuryFee(0)).to.not.be.reverted;
         const data = abiCoder.encode(
@@ -276,6 +315,8 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
         );
       });
 
+=======
+>>>>>>> dd137b2 (Initial commit)
       it('UserTwo should fail to collect without following', async function () {
         const data = abiCoder.encode(
           ['address', 'uint256'],
@@ -318,7 +359,11 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
         );
         await expect(
           lensHub.connect(userTwo).collect(FIRST_PROFILE_ID, 1, data)
+<<<<<<< HEAD
         ).to.be.revertedWith(ERRORS.ERC20_INSUFFICIENT_ALLOWANCE);
+=======
+        ).to.be.revertedWith(ERRORS.ERC20_TRANSFER_EXCEEDS_ALLOWANCE);
+>>>>>>> dd137b2 (Initial commit)
       });
 
       it('UserTwo should mirror the original post, fail to collect from their mirror without following the original profile', async function () {
@@ -418,14 +463,21 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
   context('Scenarios', function () {
     it('User should post with limited fee collect module as the collect module and data, correct events should be emitted', async function () {
       const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
+=======
+        ['uint256', 'uint256', 'address', 'address', 'uint16'],
+>>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
+<<<<<<< HEAD
           true,
+=======
+>>>>>>> dd137b2 (Initial commit)
         ]
       );
       const tx = lensHub.post({
@@ -454,14 +506,21 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
     it('User should post with limited fee collect module as the collect module and data, fetched publication data should be accurate', async function () {
       const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
+=======
+        ['uint256', 'uint256', 'address', 'address', 'uint16'],
+>>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
+<<<<<<< HEAD
           true,
+=======
+>>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(
@@ -481,6 +540,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
       expect(fetchedData.recipient).to.eq(userAddress);
       expect(fetchedData.currency).to.eq(currency.address);
       expect(fetchedData.referralFee).to.eq(REFERRAL_FEE_BPS);
+<<<<<<< HEAD
       expect(fetchedData.followerOnly).to.eq(true);
     });
 
@@ -528,18 +588,27 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
       );
       expect(await currency.balanceOf(userAddress)).to.eq(expectedRecipientAmount);
       expect(await currency.balanceOf(treasuryAddress)).to.eq(expectedTreasuryAmount);
+=======
+>>>>>>> dd137b2 (Initial commit)
     });
 
     it('User should post with limited fee collect module as the collect module and data, user two follows, then collects and pays fee, fee distribution is valid', async function () {
       const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
+=======
+        ['uint256', 'uint256', 'address', 'address', 'uint16'],
+>>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
+<<<<<<< HEAD
           true,
+=======
+>>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(
@@ -579,14 +648,21 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
     it('User should post with limited fee collect module as the collect module and data, user two follows, then collects twice, fee distribution is valid', async function () {
       const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
+=======
+        ['uint256', 'uint256', 'address', 'address', 'uint16'],
+>>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
+<<<<<<< HEAD
           true,
+=======
+>>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(
@@ -628,14 +704,21 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
     it('User should post with limited fee collect module as the collect module and data, user two mirrors, follows, then collects from their mirror and pays fee, fee distribution is valid', async function () {
       const secondProfileId = FIRST_PROFILE_ID + 1;
       const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
+=======
+        ['uint256', 'uint256', 'address', 'address', 'uint16'],
+>>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
+<<<<<<< HEAD
           true,
+=======
+>>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(
@@ -702,8 +785,13 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
     it('User should post with limited fee collect module as the collect module and data, with no referral fee, user two mirrors, follows, then collects from their mirror and pays fee, fee distribution is valid', async function () {
       const secondProfileId = FIRST_PROFILE_ID + 1;
       const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
         [DEFAULT_COLLECT_LIMIT, DEFAULT_COLLECT_PRICE, currency.address, userAddress, 0, true]
+=======
+        ['uint256', 'uint256', 'address', 'address', 'uint16'],
+        [DEFAULT_COLLECT_LIMIT, DEFAULT_COLLECT_PRICE, currency.address, userAddress, 0]
+>>>>>>> dd137b2 (Initial commit)
       );
       await expect(
         lensHub.post({
@@ -763,14 +851,21 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
     it('User should post with limited fee collect module as the collect module and data, user two mirrors, follows, then collects once from the original, twice from the mirror, and fails to collect a third time from either the mirror or the original', async function () {
       const secondProfileId = FIRST_PROFILE_ID + 1;
       const collectModuleData = abiCoder.encode(
+<<<<<<< HEAD
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
+=======
+        ['uint256', 'uint256', 'address', 'address', 'uint16'],
+>>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
+<<<<<<< HEAD
           true,
+=======
+>>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(

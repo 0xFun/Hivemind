@@ -10,7 +10,11 @@ import {LensNFTBase} from './base/LensNFTBase.sol';
 
 /**
  * @title CollectNFT
+<<<<<<< HEAD
  * @author Lens Protocol
+=======
+ * @author Lens
+>>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is the NFT contract that is minted upon collecting a given publication. It is cloned upon
  * the first collect for a given publication, and the token URI points to the original publication's contentURI.
@@ -27,9 +31,13 @@ contract CollectNFT is ICollectNFT, LensNFTBase {
     // We create the CollectNFT with the pre-computed HUB address before deploying the hub proxy in order
     // to initialize the hub proxy at construction.
     constructor(address hub) {
+<<<<<<< HEAD
         if (hub == address(0)) revert Errors.InitParamsInvalid();
         HUB = hub;
         _initialized = true;
+=======
+        HUB = hub;
+>>>>>>> dd137b2 (Initial commit)
     }
 
     /// @inheritdoc ICollectNFT
@@ -50,10 +58,15 @@ contract CollectNFT is ICollectNFT, LensNFTBase {
     /// @inheritdoc ICollectNFT
     function mint(address to) external override {
         if (msg.sender != HUB) revert Errors.NotHub();
+<<<<<<< HEAD
         unchecked {
             uint256 tokenId = ++_tokenIdCounter;
             _mint(to, tokenId);
         }
+=======
+        uint256 tokenId = ++_tokenIdCounter;
+        _mint(to, tokenId);
+>>>>>>> dd137b2 (Initial commit)
     }
 
     /// @inheritdoc ICollectNFT

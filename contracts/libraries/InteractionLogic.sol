@@ -16,7 +16,11 @@ import {Strings} from '@openzeppelin/contracts/utils/Strings.sol';
 
 /**
  * @title InteractionLogic
+<<<<<<< HEAD
  * @author Lens Protocol
+=======
+ * @author Lens
+>>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is the library that contains the logic for follows & collects. 
  
@@ -34,7 +38,10 @@ library InteractionLogic {
      * @param followModuleDatas The array of follow module data parameters to pass to each profile's follow module.
      * @param followNFTImpl The address of the follow NFT implementation, which has to be passed because it's an immutable in the hub.
      * @param _profileById A pointer to the storage mapping of profile structs by profile ID.
+<<<<<<< HEAD
      * @param _profileIdByHandleHash A pointer to the storage mapping of profile IDs by handle hash.
+=======
+>>>>>>> dd137b2 (Initial commit)
      */
     function follow(
         address follower,
@@ -45,10 +52,16 @@ library InteractionLogic {
         mapping(bytes32 => uint256) storage _profileIdByHandleHash
     ) external {
         if (profileIds.length != followModuleDatas.length) revert Errors.ArrayMismatch();
+<<<<<<< HEAD
         for (uint256 i = 0; i < profileIds.length; ) {
             string memory handle = _profileById[profileIds[i]].handle;
             if (_profileIdByHandleHash[keccak256(bytes(handle))] != profileIds[i])
                 revert Errors.TokenDoesNotExist();
+=======
+        for (uint256 i = 0; i < profileIds.length; i++) {
+            string memory handle = _profileById[profileIds[i]].handle;
+            if (_profileIdByHandleHash[keccak256(bytes(handle))] == 0) revert Errors.TokenDoesNotExist();
+>>>>>>> dd137b2 (Initial commit)
 
             address followModule = _profileById[profileIds[i]].followModule;
 
@@ -80,10 +93,15 @@ library InteractionLogic {
                     followModuleDatas[i]
                 );
             }
+<<<<<<< HEAD
             unchecked {
                 ++i;
             }
         }
+=======
+        }
+        emit Events.Followed(follower, profileIds, block.timestamp);
+>>>>>>> dd137b2 (Initial commit)
     }
 
     /**

@@ -4,7 +4,11 @@ pragma solidity 0.8.10;
 
 /**
  * @title ICollectNFT
+<<<<<<< HEAD
  * @author Lens Protocol
+=======
+ * @author Lens
+>>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is the interface for the CollectNFT contract. Which is cloned upon the first collect for any given
  * publication.
@@ -37,7 +41,11 @@ interface ICollectNFT {
     /**
      * @notice Returns the source publication pointer mapped to this collect NFT.
      *
+<<<<<<< HEAD
      * @return tuple First the profile ID uint256, and second the pubId uint256.
+=======
+     * @return First the profile ID uint256, and second the pubId uint256.
+>>>>>>> dd137b2 (Initial commit)
      */
     function getSourcePublicationPointer() external view returns (uint256, uint256);
 }

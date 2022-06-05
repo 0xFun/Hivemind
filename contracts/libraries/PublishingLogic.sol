@@ -13,7 +13,11 @@ import {IReferenceModule} from '../interfaces/IReferenceModule.sol';
 
 /**
  * @title PublishingLogic
+<<<<<<< HEAD
  * @author Lens Protocol
+=======
+ * @author Lens
+>>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is the library that contains the logic for profile creation & publication.
  *
@@ -193,10 +197,13 @@ library PublishingLogic {
         if (pubCount < vars.pubIdPointed || vars.pubIdPointed == 0)
             revert Errors.PublicationDoesNotExist();
 
+<<<<<<< HEAD
         // Ensure the pointed publication is not the comment being created
         if (vars.profileId == vars.profileIdPointed && vars.pubIdPointed == pubId)
             revert Errors.CannotCommentOnSelf();
 
+=======
+>>>>>>> dd137b2 (Initial commit)
         _pubByIdByProfile[vars.profileId][pubId].contentURI = vars.contentURI;
         _pubByIdByProfile[vars.profileId][pubId].profileIdPointed = vars.profileIdPointed;
         _pubByIdByProfile[vars.profileId][pubId].pubIdPointed = vars.pubIdPointed;
@@ -404,6 +411,7 @@ library PublishingLogic {
         if (byteHandle.length == 0 || byteHandle.length > Constants.MAX_HANDLE_LENGTH)
             revert Errors.HandleLengthInvalid();
 
+<<<<<<< HEAD
         uint256 byteHandleLength = byteHandle.length;
         for (uint256 i = 0; i < byteHandleLength; ) {
             if (
@@ -417,6 +425,14 @@ library PublishingLogic {
             unchecked {
                 ++i;
             }
+=======
+        for (uint256 i = 0; i < byteHandle.length; i++) {
+            if (
+                (byteHandle[i] < '0' ||
+                    byteHandle[i] > 'z' ||
+                    (byteHandle[i] > '9' && byteHandle[i] < 'a')) && byteHandle[i] != '.'
+            ) revert Errors.HandleContainsInvalidCharacters();
+>>>>>>> dd137b2 (Initial commit)
         }
     }
 }

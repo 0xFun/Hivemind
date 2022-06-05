@@ -111,6 +111,7 @@ abstract contract ERC721Time is Context, ERC165, IERC721Time, IERC721Metadata {
     }
 
     /**
+<<<<<<< HEAD
      * @dev See {IERC721Time-exists}
      */
     function exists(uint256 tokenId) public view virtual override returns (bool) {
@@ -118,6 +119,8 @@ abstract contract ERC721Time is Context, ERC165, IERC721Time, IERC721Metadata {
     }
 
     /**
+=======
+>>>>>>> dd137b2 (Initial commit)
      * @dev See {IERC721Metadata-name}.
      */
     function name() public view virtual override returns (string memory) {
@@ -440,7 +443,11 @@ abstract contract ERC721Time is Context, ERC165, IERC721Time, IERC721Metadata {
     }
 
     /**
+<<<<<<< HEAD
      * @dev Private function to invoke {IERC721Receiver-onERC721Received} on a target address.
+=======
+     * @dev Internal function to invoke {IERC721Receiver-onERC721Received} on a target address.
+>>>>>>> dd137b2 (Initial commit)
      * The call is not executed if the target address is not a contract.
      *
      * @param from address representing the previous owner of the given token ID

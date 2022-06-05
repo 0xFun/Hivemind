@@ -8,7 +8,11 @@ import {IModuleGlobals} from '../../interfaces/IModuleGlobals.sol';
 
 /**
  * @title FeeModuleBase
+<<<<<<< HEAD
  * @author Lens Protocol
+=======
+ * @author Lens
+>>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is an abstract contract to be inherited from by modules that require basic fee functionality. It
  * contains getters for module globals parameters as well as a validation function to check expected data.

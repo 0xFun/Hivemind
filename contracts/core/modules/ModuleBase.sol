@@ -7,7 +7,11 @@ import {Events} from '../../libraries/Events.sol';
 
 /**
  * @title ModuleBase
+<<<<<<< HEAD
  * @author Lens Protocol
+=======
+ * @author Lens
+>>>>>>> dd137b2 (Initial commit)
  *
  * @notice This abstract contract adds a public `HUB` immutable to inheriting modules, as well as an
  * `onlyHub` modifier.

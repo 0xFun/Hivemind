@@ -184,6 +184,7 @@ makeSuiteCleanRoom('Profile Creation', function () {
         expect(tokenData.mintTimestamp).to.eq(timestamp);
       });
 
+<<<<<<< HEAD
       it('User should be able to create a profile with a handle including "-" and "_" characters', async function () {
         await expect(
           lensHub.createProfile({
@@ -197,6 +198,8 @@ makeSuiteCleanRoom('Profile Creation', function () {
         ).to.not.be.reverted;
       });
 
+=======
+>>>>>>> dd137b2 (Initial commit)
       it('User should be able to create a profile with a handle 16 bytes long, then fail to create with the same handle, and create again with a different handle', async function () {
         await expect(
           lensHub.createProfile({

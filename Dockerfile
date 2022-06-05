@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # syntax=docker/dockerfile:1.3
 FROM ethereum/solc:0.8.7 as build-deps
 
@@ -19,3 +20,10 @@ COPY docker-entrypoint.sh /docker-entrypoint.sh
 USER node
 
 ENTRYPOINT ["sh", "/docker-entrypoint.sh"]
+=======
+FROM ethereum/solc:0.8.7 as build-deps
+
+FROM node:16
+USER node
+COPY --from=build-deps /usr/bin/solc /usr/bin/solc
+>>>>>>> dd137b2 (Initial commit)

@@ -11,7 +11,11 @@ import {
 } from '../../helpers/utils';
 import {
   lensHub,
+<<<<<<< HEAD
   freeCollectModule,
+=======
+  emptyCollectModule,
+>>>>>>> dd137b2 (Initial commit)
   FIRST_PROFILE_ID,
   governance,
   makeSuiteCleanRoom,
@@ -23,14 +27,21 @@ import {
   userTwo,
   userTwoAddress,
   MOCK_FOLLOW_NFT_URI,
+<<<<<<< HEAD
   abiCoder,
   user,
+=======
+>>>>>>> dd137b2 (Initial commit)
 } from '../../__setup.spec';
 
 makeSuiteCleanRoom('Collecting', function () {
   beforeEach(async function () {
     await expect(
+<<<<<<< HEAD
       lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+      lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
     ).to.not.be.reverted;
     await expect(
       lensHub.createProfile({
@@ -46,8 +57,13 @@ makeSuiteCleanRoom('Collecting', function () {
       lensHub.post({
         profileId: FIRST_PROFILE_ID,
         contentURI: MOCK_URI,
+<<<<<<< HEAD
         collectModule: freeCollectModule.address,
         collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+        collectModule: emptyCollectModule.address,
+        collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
         referenceModule: ZERO_ADDRESS,
         referenceModuleData: [],
       })
@@ -79,6 +95,7 @@ makeSuiteCleanRoom('Collecting', function () {
     });
 
     context('Scenarios', function () {
+<<<<<<< HEAD
       it('Collecting should work if the collector is the publication owner even when he is not following himself and follow NFT was not deployed', async function () {
         await expect(lensHub.collect(FIRST_PROFILE_ID, 1, [])).to.not.be.reverted;
       });
@@ -95,6 +112,8 @@ makeSuiteCleanRoom('Collecting', function () {
         await expect(lensHub.collect(FIRST_PROFILE_ID, 1, [])).to.not.be.reverted;
       });
 
+=======
+>>>>>>> dd137b2 (Initial commit)
       it('UserTwo should follow, then collect, receive a collect NFT with the expected properties', async function () {
         await expect(lensHub.connect(userTwo).follow([FIRST_PROFILE_ID], [[]])).to.not.be.reverted;
         await expect(lensHub.connect(userTwo).collect(FIRST_PROFILE_ID, 1, [])).to.not.be.reverted;

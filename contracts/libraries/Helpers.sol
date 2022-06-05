@@ -7,7 +7,11 @@ import {Errors} from './Errors.sol';
 
 /**
  * @title Helpers
+<<<<<<< HEAD
  * @author Lens Protocol
+=======
+ * @author Lens
+>>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is a library that only contains a single function that is used in the hub contract as well as in
  * both the publishing logic and interaction logic libraries.
@@ -21,8 +25,13 @@ library Helpers {
      * @param pubId The publication ID of the given publication.
      * @param _pubByIdByProfile A pointer to the storage mapping of publications by pubId by profile ID.
      *
+<<<<<<< HEAD
      * @return tuple First, the pointed publication's publishing profile ID, second, the pointed publication's ID, and third, the 
      * pointed publication's collect module. If the passed publication is not a mirror, this returns the given publication.
+=======
+     * @return The pointed publication identifier if the the given publication is a mirror, otherwise, the given publication.
+     * This is a tuple of (profileId, pubId, collectModule)
+>>>>>>> dd137b2 (Initial commit)
      */
     function getPointedIfMirror(
         uint256 profileId,

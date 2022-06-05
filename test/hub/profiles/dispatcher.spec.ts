@@ -4,7 +4,11 @@ import { MAX_UINT256, ZERO_ADDRESS } from '../../helpers/constants';
 import { ERRORS } from '../../helpers/errors';
 import { cancelWithPermitForAll, getSetDispatcherWithSigParts } from '../../helpers/utils';
 import {
+<<<<<<< HEAD
   freeCollectModule,
+=======
+  emptyCollectModule,
+>>>>>>> dd137b2 (Initial commit)
   FIRST_PROFILE_ID,
   governance,
   lensHub,
@@ -17,7 +21,10 @@ import {
   userAddress,
   userTwo,
   userTwoAddress,
+<<<<<<< HEAD
   abiCoder,
+=======
+>>>>>>> dd137b2 (Initial commit)
 } from '../../__setup.spec';
 
 makeSuiteCleanRoom('Dispatcher Functionality', function () {
@@ -34,7 +41,11 @@ makeSuiteCleanRoom('Dispatcher Functionality', function () {
         })
       ).to.not.be.reverted;
       await expect(
+<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
     });
 
@@ -50,8 +61,13 @@ makeSuiteCleanRoom('Dispatcher Functionality', function () {
           lensHub.connect(userTwo).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -74,8 +90,13 @@ makeSuiteCleanRoom('Dispatcher Functionality', function () {
           lensHub.connect(userTwo).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -87,8 +108,13 @@ makeSuiteCleanRoom('Dispatcher Functionality', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -120,7 +146,11 @@ makeSuiteCleanRoom('Dispatcher Functionality', function () {
         })
       ).to.not.be.reverted;
       await expect(
+<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
     });
 
@@ -247,8 +277,13 @@ makeSuiteCleanRoom('Dispatcher Functionality', function () {
           lensHub.connect(userTwo).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })
@@ -260,8 +295,13 @@ makeSuiteCleanRoom('Dispatcher Functionality', function () {
             contentURI: MOCK_URI,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
           })

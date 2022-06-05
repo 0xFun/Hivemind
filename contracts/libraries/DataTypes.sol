@@ -4,9 +4,15 @@ pragma solidity 0.8.10;
 
 /**
  * @title DataTypes
+<<<<<<< HEAD
  * @author Lens Protocol
  *
  * @notice A standard library of data types used throughout the Lens Protocol.
+=======
+ * @author Lens
+ *
+ * @notice A standard library of data types used throughout the Lens protocol.
+>>>>>>> dd137b2 (Initial commit)
  */
 library DataTypes {
     /**
@@ -110,6 +116,7 @@ library DataTypes {
     }
 
     /**
+<<<<<<< HEAD
      * @notice A struct containing the parameters required for the `setDefaultProfileWithSig()` function. Parameters are
      * the same as the regular `setDefaultProfile()` function, with an added EIP712Signature.
      *
@@ -124,6 +131,8 @@ library DataTypes {
     }
 
     /**
+=======
+>>>>>>> dd137b2 (Initial commit)
      * @notice A struct containing the parameters required for the `setFollowModuleWithSig()` function. Parameters are
      * the same as the regular `setFollowModule()` function, with an added EIP712Signature.
      *
@@ -341,6 +350,7 @@ library DataTypes {
         bytes data;
         EIP712Signature sig;
     }
+<<<<<<< HEAD
 
     /**
      * @notice A struct containing the parameters required for the `toggleFollowWithSig()` function.
@@ -356,4 +366,6 @@ library DataTypes {
         bool[] enables;
         EIP712Signature sig;
     }
+=======
+>>>>>>> dd137b2 (Initial commit)
 }

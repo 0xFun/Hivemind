@@ -5,7 +5,11 @@ import { ERRORS } from '../../helpers/errors';
 import { cancelWithPermitForAll, getMirrorWithSigParts } from '../../helpers/utils';
 import {
   abiCoder,
+<<<<<<< HEAD
   freeCollectModule,
+=======
+  emptyCollectModule,
+>>>>>>> dd137b2 (Initial commit)
   FIRST_PROFILE_ID,
   governance,
   lensHub,
@@ -35,7 +39,11 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
       ).to.not.be.reverted;
 
       await expect(
+<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
@@ -46,8 +54,13 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
+<<<<<<< HEAD
           collectModule: freeCollectModule.address,
           collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+          collectModule: emptyCollectModule.address,
+          collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
           referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
         })
@@ -161,8 +174,13 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
+<<<<<<< HEAD
             collectModule: freeCollectModule.address,
             collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+            collectModule: emptyCollectModule.address,
+            collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
             referenceModule: mockReferenceModule.address,
             referenceModuleData: data,
           })
@@ -195,15 +213,24 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
       ).to.not.be.reverted;
 
       await expect(
+<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+=======
+        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
+>>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.connect(testWallet).post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
+<<<<<<< HEAD
           collectModule: freeCollectModule.address,
           collectModuleData: abiCoder.encode(['bool'], [true]),
+=======
+          collectModule: emptyCollectModule.address,
+          collectModuleData: [],
+>>>>>>> dd137b2 (Initial commit)
           referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
         })

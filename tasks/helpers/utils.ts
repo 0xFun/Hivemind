@@ -1,9 +1,17 @@
 import '@nomiclabs/hardhat-ethers';
+<<<<<<< HEAD
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract, ContractTransaction } from 'ethers';
 import fs from 'fs';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { runtimeHRE } from '../full-deploy-verify';
+=======
+import { BytesLike, Signer, Wallet, ContractTransaction, BaseContract } from 'ethers';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { LensHub__factory } from '../../typechain-types';
+import fs from 'fs';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+>>>>>>> dd137b2 (Initial commit)
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -23,12 +31,17 @@ export async function waitForTx(tx: Promise<ContractTransaction>) {
   await (await tx).wait();
 }
 
+<<<<<<< HEAD
 export async function deployContract(tx: any): Promise<Contract> {
+=======
+export async function deployContract(tx: any): Promise<any> {
+>>>>>>> dd137b2 (Initial commit)
   const result = await tx;
   await result.deployTransaction.wait();
   return result;
 }
 
+<<<<<<< HEAD
 export async function deployWithVerify(
   tx: any,
   args: any,
@@ -67,6 +80,8 @@ export async function deployWithVerify(
   return deployedContract;
 }
 
+=======
+>>>>>>> dd137b2 (Initial commit)
 export async function initEnv(hre: HardhatRuntimeEnvironment): Promise<SignerWithAddress[]> {
   const ethers = hre.ethers; // This allows us to access the hre (Hardhat runtime environment)'s injected ethers instance easily
 
@@ -77,7 +92,10 @@ export async function initEnv(hre: HardhatRuntimeEnvironment): Promise<SignerWit
 
   return [governance, treasury, user];
 }
+<<<<<<< HEAD
 
 async function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+=======
+>>>>>>> dd137b2 (Initial commit)

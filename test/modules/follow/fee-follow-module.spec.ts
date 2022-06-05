@@ -76,10 +76,17 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
       });
 
+<<<<<<< HEAD
       it('user should fail to create a profile with fee follow module using zero amount', async function () {
         const followModuleData = abiCoder.encode(
           ['uint256', 'address', 'address'],
           [0, currency.address, userAddress]
+=======
+      it('user should fail to create a profile with fee follow module using amount lower than max BPS', async function () {
+        const followModuleData = abiCoder.encode(
+          ['uint256', 'address', 'address'],
+          [9999, currency.address, userAddress]
+>>>>>>> dd137b2 (Initial commit)
         );
 
         await expect(
@@ -113,6 +120,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
         ).to.not.be.reverted;
       });
 
+<<<<<<< HEAD
       it('Governance should set the treasury fee BPS to zero, userTwo following should not emit a transfer event to the treasury', async function () {
         await expect(moduleGlobals.connect(governance).setTreasuryFee(0)).to.not.be.reverted;
         const data = abiCoder.encode(
@@ -143,6 +151,8 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
         );
       });
 
+=======
+>>>>>>> dd137b2 (Initial commit)
       it('UserTwo should fail to follow passing a different expected price in data', async function () {
         const data = abiCoder.encode(
           ['address', 'uint256'],
@@ -169,7 +179,11 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
         );
         await expect(
           lensHub.connect(userTwo).follow([FIRST_PROFILE_ID], [data])
+<<<<<<< HEAD
         ).to.be.revertedWith(ERRORS.ERC20_INSUFFICIENT_ALLOWANCE);
+=======
+        ).to.be.revertedWith(ERRORS.ERC20_TRANSFER_EXCEEDS_ALLOWANCE);
+>>>>>>> dd137b2 (Initial commit)
       });
     });
   });
