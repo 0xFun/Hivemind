@@ -1,14 +1,10 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
 /**
  * @title IFollowModule
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is the standard interface for all Lens-compatible FollowModules.
  */
@@ -18,11 +14,8 @@ interface IFollowModule {
      *
      * @param profileId The token ID of the profile to initialize this follow module for.
      * @param data Arbitrary data passed by the profile creator.
-<<<<<<< HEAD
      *
      * @return bytes The encoded data to emit in the hub.
-=======
->>>>>>> dd137b2 (Initial commit)
      */
     function initializeFollowModule(uint256 profileId, bytes calldata data)
         external
@@ -73,18 +66,13 @@ interface IFollowModule {
      *      1. The collect module:
      *          - Decodes a follower NFT token ID from user-passed data.
      *          - Fetches the follow module from the hub.
-<<<<<<< HEAD
      *          - Calls `isFollowing` passing the profile ID, follower & follower token ID and checks it returned true.
-=======
-     *          - Calls `validateFollow` passing the profile ID, follower & follower token ID.
->>>>>>> dd137b2 (Initial commit)
      *      2. The follow module:
      *          - Validates the subscription status for that given NFT, reverting on an invalid subscription.
      *
      * @param profileId The token ID of the profile to validate the follow for.
      * @param follower The follower address to validate the follow for.
      * @param followNFTTokenId The followNFT token ID to validate the follow for.
-<<<<<<< HEAD
      *
      * @return true if the given address is following the given profile ID, false otherwise.
      */
@@ -93,12 +81,4 @@ interface IFollowModule {
         address follower,
         uint256 followNFTTokenId
     ) external view returns (bool);
-=======
-     */
-    function validateFollow(
-        uint256 profileId,
-        address follower,
-        uint256 followNFTTokenId
-    ) external view;
->>>>>>> dd137b2 (Initial commit)
 }

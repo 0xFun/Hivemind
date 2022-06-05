@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -27,16 +27,12 @@ struct ProfileData {
 
 /**
  * @title FeeFollowModule
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is a simple Lens FollowModule implementation, inheriting from the IFollowModule interface, but with additional
  * variables that can be controlled by governance, such as the governance & treasury addresses as well as the treasury fee.
  */
-contract FeeFollowModule is IFollowModule, FeeModuleBase, FollowValidatorFollowModuleBase {
+contract FeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase {
     using SafeERC20 for IERC20;
 
     mapping(uint256 => ProfileData) internal _dataByProfile;
@@ -46,20 +42,13 @@ contract FeeFollowModule is IFollowModule, FeeModuleBase, FollowValidatorFollowM
     /**
      * @notice This follow module levies a fee on follows.
      *
-<<<<<<< HEAD
      * @param profileId The profile ID of the profile to initialize this module for.
-=======
->>>>>>> dd137b2 (Initial commit)
      * @param data The arbitrary data parameter, decoded into:
      *      address currency: The currency address, must be internally whitelisted.
      *      uint256 amount: The currency total amount to levy.
      *      address recipient: The custom recipient address to direct earnings to.
      *
-<<<<<<< HEAD
      * @return bytes An abi encoded bytes parameter, which is the same as the passed data parameter.
-=======
-     * @return An abi encoded bytes parameter, which is the same as the passed data parameter.
->>>>>>> dd137b2 (Initial commit)
      */
     function initializeFollowModule(uint256 profileId, bytes calldata data)
         external
@@ -71,11 +60,7 @@ contract FeeFollowModule is IFollowModule, FeeModuleBase, FollowValidatorFollowM
             data,
             (uint256, address, address)
         );
-<<<<<<< HEAD
         if (!_currencyWhitelisted(currency) || recipient == address(0) || amount == 0)
-=======
-        if (!_currencyWhitelisted(currency) || recipient == address(0) || amount < BPS_MAX)
->>>>>>> dd137b2 (Initial commit)
             revert Errors.InitParamsInvalid();
 
         _dataByProfile[profileId].amount = amount;
@@ -103,12 +88,8 @@ contract FeeFollowModule is IFollowModule, FeeModuleBase, FollowValidatorFollowM
         uint256 adjustedAmount = amount - treasuryAmount;
 
         IERC20(currency).safeTransferFrom(follower, recipient, adjustedAmount);
-<<<<<<< HEAD
         if (treasuryAmount > 0)
             IERC20(currency).safeTransferFrom(follower, treasury, treasuryAmount);
-=======
-        IERC20(currency).safeTransferFrom(follower, treasury, treasuryAmount);
->>>>>>> dd137b2 (Initial commit)
     }
 
     /**
@@ -127,11 +108,7 @@ contract FeeFollowModule is IFollowModule, FeeModuleBase, FollowValidatorFollowM
      *
      * @param profileId The token ID of the profile to query.
      *
-<<<<<<< HEAD
      * @return ProfileData The ProfileData struct mapped to that profile.
-=======
-     * @return The ProfileData struct mapped to that profile.
->>>>>>> dd137b2 (Initial commit)
      */
     function getProfileData(uint256 profileId) external view returns (ProfileData memory) {
         return _dataByProfile[profileId];

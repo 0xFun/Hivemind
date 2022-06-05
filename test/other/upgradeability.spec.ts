@@ -27,20 +27,12 @@ makeSuiteCleanRoom('Upgradeability', function () {
     const proxyHub = TransparentUpgradeableProxy__factory.connect(lensHub.address, deployer);
 
     let prevStorage: string[] = [];
-<<<<<<< HEAD
     for (let i = 0; i < 24; i++) {
-=======
-    for (let i = 0; i < 23; i++) {
->>>>>>> dd137b2 (Initial commit)
       const valueAt = await ethers.provider.getStorageAt(proxyHub.address, i);
       prevStorage.push(valueAt);
     }
 
-<<<<<<< HEAD
     let prevNextSlot = await ethers.provider.getStorageAt(proxyHub.address, 24);
-=======
-    let prevNextSlot = await ethers.provider.getStorageAt(proxyHub.address, 23);
->>>>>>> dd137b2 (Initial commit)
     const formattedZero = abiCoder.encode(['uint256'], [0]);
     expect(prevNextSlot).to.eq(formattedZero);
 
@@ -49,20 +41,12 @@ makeSuiteCleanRoom('Upgradeability', function () {
       MockLensHubV2__factory.connect(proxyHub.address, user).setAdditionalValue(valueToSet)
     ).to.not.be.reverted;
 
-<<<<<<< HEAD
     for (let i = 0; i < 24; i++) {
-=======
-    for (let i = 0; i < 23; i++) {
->>>>>>> dd137b2 (Initial commit)
       const valueAt = await ethers.provider.getStorageAt(proxyHub.address, i);
       expect(valueAt).to.eq(prevStorage[i]);
     }
 
-<<<<<<< HEAD
     const newNextSlot = await ethers.provider.getStorageAt(proxyHub.address, 24);
-=======
-    const newNextSlot = await ethers.provider.getStorageAt(proxyHub.address, 23);
->>>>>>> dd137b2 (Initial commit)
     const formattedValue = abiCoder.encode(['uint256'], [valueToSet]);
     expect(newNextSlot).to.eq(formattedValue);
   });

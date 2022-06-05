@@ -1,14 +1,10 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
 /**
  * @title ICollectNFT
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is the interface for the CollectNFT contract. Which is cloned upon the first collect for any given
  * publication.
@@ -35,17 +31,15 @@ interface ICollectNFT {
      * upon collection.
      *
      * @param to The address to mint the NFT to.
+     *
+     * @return uint256 An interger representing the minted token ID.
      */
-    function mint(address to) external;
+    function mint(address to) external returns (uint256);
 
     /**
      * @notice Returns the source publication pointer mapped to this collect NFT.
      *
-<<<<<<< HEAD
      * @return tuple First the profile ID uint256, and second the pubId uint256.
-=======
-     * @return First the profile ID uint256, and second the pubId uint256.
->>>>>>> dd137b2 (Initial commit)
      */
     function getSourcePublicationPointer() external view returns (uint256, uint256);
 }

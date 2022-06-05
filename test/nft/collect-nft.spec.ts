@@ -4,11 +4,7 @@ import { CollectNFT, CollectNFT__factory } from '../../typechain-types';
 import { ZERO_ADDRESS } from '../helpers/constants';
 import { ERRORS } from '../helpers/errors';
 import {
-<<<<<<< HEAD
   freeCollectModule,
-=======
-  emptyCollectModule,
->>>>>>> dd137b2 (Initial commit)
   FIRST_PROFILE_ID,
   governance,
   lensHub,
@@ -20,21 +16,14 @@ import {
   user,
   userAddress,
   userTwo,
-<<<<<<< HEAD
   abiCoder,
-=======
->>>>>>> dd137b2 (Initial commit)
 } from '../__setup.spec';
 
 makeSuiteCleanRoom('Collect NFT', function () {
   let collectNFT: CollectNFT;
   beforeEach(async function () {
     await expect(
-<<<<<<< HEAD
       lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-      lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
     ).to.not.be.reverted;
     await expect(
       lensHub.createProfile({
@@ -42,7 +31,7 @@ makeSuiteCleanRoom('Collect NFT', function () {
         handle: MOCK_PROFILE_HANDLE,
         imageURI: MOCK_PROFILE_URI,
         followModule: ZERO_ADDRESS,
-        followModuleData: [],
+        followModuleInitData: [],
         followNFTURI: MOCK_FOLLOW_NFT_URI,
       })
     ).to.not.be.reverted;
@@ -50,15 +39,10 @@ makeSuiteCleanRoom('Collect NFT', function () {
       lensHub.post({
         profileId: FIRST_PROFILE_ID,
         contentURI: MOCK_URI,
-<<<<<<< HEAD
         collectModule: freeCollectModule.address,
-        collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-        collectModule: emptyCollectModule.address,
-        collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+        collectModuleInitData: abiCoder.encode(['bool'], [true]),
         referenceModule: ZERO_ADDRESS,
-        referenceModuleData: [],
+        referenceModuleInitData: [],
       })
     ).to.not.be.reverted;
     await expect(lensHub.follow([FIRST_PROFILE_ID], [[]])).to.not.be.reverted;

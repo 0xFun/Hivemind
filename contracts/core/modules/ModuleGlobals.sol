@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -8,11 +8,7 @@ import {IModuleGlobals} from '../../interfaces/IModuleGlobals.sol';
 
 /**
  * @title ModuleGlobals
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This contract contains data relevant to Lens modules, such as the module governance address, treasury
  * address and treasury fee BPS.

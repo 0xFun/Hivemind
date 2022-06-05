@@ -2,14 +2,14 @@ import '@nomiclabs/hardhat-ethers';
 import { expect } from 'chai';
 import { MAX_UINT256, ZERO_ADDRESS } from '../../helpers/constants';
 import { ERRORS } from '../../helpers/errors';
-import { cancelWithPermitForAll, getMirrorWithSigParts } from '../../helpers/utils';
+import {
+  cancelWithPermitForAll,
+  getMirrorWithSigParts,
+  mirrorReturningTokenId,
+} from '../../helpers/utils';
 import {
   abiCoder,
-<<<<<<< HEAD
   freeCollectModule,
-=======
-  emptyCollectModule,
->>>>>>> dd137b2 (Initial commit)
   FIRST_PROFILE_ID,
   governance,
   lensHub,
@@ -22,6 +22,7 @@ import {
   testWallet,
   userAddress,
   userTwo,
+  userTwoAddress,
 } from '../../__setup.spec';
 
 makeSuiteCleanRoom('Publishing mirrors', function () {
@@ -33,17 +34,13 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
 
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
@@ -54,15 +51,10 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
     });
@@ -74,8 +66,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.NOT_PROFILE_OWNER_OR_DISPATCHER);
       });
@@ -86,8 +79,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            referenceModule: userAddress,
             referenceModuleData: [],
+            referenceModule: userAddress,
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.REFERENCE_MODULE_NOT_WHITELISTED);
       });
@@ -98,8 +92,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
+            referenceModuleData: [],
             referenceModule: mockReferenceModule.address,
-            referenceModuleData: [0x12, 0x23],
+            referenceModuleInitData: [0x12, 0x23],
           })
         ).to.be.revertedWith(ERRORS.NO_REASON_ABI_DECODE);
       });
@@ -110,22 +105,120 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 2,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.PUBLICATION_DOES_NOT_EXIST);
       });
     });
 
     context('Scenarios', function () {
+      it('Should return the expected token IDs when mirroring publications', async function () {
+        await expect(
+          lensHub.createProfile({
+            to: testWallet.address,
+            handle: 'testwallet',
+            imageURI: MOCK_PROFILE_URI,
+            followModule: ZERO_ADDRESS,
+            followModuleInitData: [],
+            followNFTURI: MOCK_FOLLOW_NFT_URI,
+          })
+        ).to.not.be.reverted;
+        await expect(
+          lensHub.createProfile({
+            to: userTwoAddress,
+            handle: 'usertwo',
+            imageURI: MOCK_PROFILE_URI,
+            followModule: ZERO_ADDRESS,
+            followModuleInitData: [],
+            followNFTURI: MOCK_FOLLOW_NFT_URI,
+          })
+        ).to.not.be.reverted;
+
+        expect(
+          await mirrorReturningTokenId({
+            vars: {
+              profileId: FIRST_PROFILE_ID,
+              profileIdPointed: FIRST_PROFILE_ID,
+              pubIdPointed: 1,
+              referenceModuleData: [],
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: [],
+            },
+          })
+        ).to.eq(2);
+
+        expect(
+          await mirrorReturningTokenId({
+            sender: userTwo,
+            vars: {
+              profileId: FIRST_PROFILE_ID + 2,
+              profileIdPointed: FIRST_PROFILE_ID,
+              pubIdPointed: 2,
+              referenceModuleData: [],
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: [],
+            },
+          })
+        ).to.eq(1);
+
+        const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const referenceModuleInitData = [];
+        const referenceModuleData = [];
+
+        const { v, r, s } = await getMirrorWithSigParts(
+          FIRST_PROFILE_ID + 1,
+          FIRST_PROFILE_ID,
+          '1',
+          referenceModuleData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
+          nonce,
+          MAX_UINT256
+        );
+        expect(
+          await mirrorReturningTokenId({
+            vars: {
+              profileId: FIRST_PROFILE_ID + 1,
+              profileIdPointed: FIRST_PROFILE_ID,
+              pubIdPointed: '1',
+              referenceModuleData: [],
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: referenceModuleInitData,
+              sig: {
+                v,
+                r,
+                s,
+                deadline: MAX_UINT256,
+              },
+            },
+          })
+        ).to.eq(1);
+
+        expect(
+          await mirrorReturningTokenId({
+            vars: {
+              profileId: FIRST_PROFILE_ID,
+              profileIdPointed: FIRST_PROFILE_ID + 1,
+              pubIdPointed: 1,
+              referenceModuleData: [],
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: [],
+            },
+          })
+        ).to.eq(3);
+      });
+
       it('User should create a mirror with empty reference module and reference module data, fetched mirror data should be accurate', async function () {
         await expect(
           lensHub.mirror({
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
@@ -144,8 +237,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
@@ -154,8 +248,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 2,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
@@ -174,15 +269,10 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-            collectModule: emptyCollectModule.address,
-            collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: mockReferenceModule.address,
-            referenceModuleData: data,
+            referenceModuleInitData: data,
           })
         ).to.not.be.reverted;
 
@@ -191,8 +281,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 2,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
       });
@@ -207,32 +298,23 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
 
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.connect(testWallet).post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
     });
@@ -240,14 +322,16 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
     context('Negatives', function () {
       it('Testwallet should fail to mirror with sig with signature deadline mismatch', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getMirrorWithSigParts(
           FIRST_PROFILE_ID,
           FIRST_PROFILE_ID,
           '1',
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           '0'
         );
@@ -257,8 +341,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+            referenceModuleData: [],
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -271,14 +356,16 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
 
       it('Testwallet should fail to mirror with sig with invalid deadline', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getMirrorWithSigParts(
           FIRST_PROFILE_ID,
           FIRST_PROFILE_ID,
           '1',
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           '0'
         );
@@ -288,8 +375,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+            referenceModuleData: [],
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -302,14 +390,16 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
 
       it('Testwallet should fail to mirror with sig with invalid deadline', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getMirrorWithSigParts(
           FIRST_PROFILE_ID,
           FIRST_PROFILE_ID,
           '1',
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce + 1,
           MAX_UINT256
         );
@@ -319,8 +409,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+            referenceModuleData: [],
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -333,14 +424,15 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
 
       it('Testwallet should fail to mirror with sig with unwhitelisted reference module', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
         const { v, r, s } = await getMirrorWithSigParts(
           FIRST_PROFILE_ID,
           FIRST_PROFILE_ID,
           '1',
-          userAddress,
           referenceModuleData,
+          userAddress,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -350,8 +442,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+            referenceModuleData: [],
             referenceModule: userAddress,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -364,14 +457,16 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
 
       it('TestWallet should fail to mirror a publication with sig that does not exist yet', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getMirrorWithSigParts(
           FIRST_PROFILE_ID,
           FIRST_PROFILE_ID,
           '2',
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -381,8 +476,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '2',
+            referenceModuleData: [],
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -395,14 +491,16 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
 
       it('TestWallet should sign attempt to mirror with sig, cancel via empty permitForAll, then fail to mirror with sig', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getMirrorWithSigParts(
           FIRST_PROFILE_ID,
           FIRST_PROFILE_ID,
           '1',
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -414,8 +512,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+            referenceModuleData: [],
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -430,14 +529,16 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
     context('Scenarios', function () {
       it('Testwallet should mirror with sig, fetched mirror data should be accurate', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
 
         const { v, r, s } = await getMirrorWithSigParts(
           FIRST_PROFILE_ID,
           FIRST_PROFILE_ID,
           '1',
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -447,8 +548,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '1',
+            referenceModuleData: [],
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -473,20 +575,23 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
+        
         const { v, r, s } = await getMirrorWithSigParts(
           FIRST_PROFILE_ID,
           FIRST_PROFILE_ID,
           '2',
-          ZERO_ADDRESS,
           referenceModuleData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -496,8 +601,9 @@ makeSuiteCleanRoom('Publishing mirrors', function () {
             profileId: FIRST_PROFILE_ID,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: '2',
+            referenceModuleData: [],
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,

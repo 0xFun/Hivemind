@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -15,7 +15,6 @@ import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
  * @notice A struct containing the necessary data to execute collect actions on a publication.
  *
  * @param amount The collecting cost associated with this publication.
-<<<<<<< HEAD
  * @param currency The currency associated with this publication.
  * @param recipient The recipient address associated with this publication.
  * @param referralFee The referral fee associated with this publication.
@@ -27,33 +26,18 @@ struct ProfilePublicationData {
     address recipient;
     uint16 referralFee;
     bool followerOnly;
-=======
- * @param recipient The recipient address associated with this publication.
- * @param currency The currency associated with this publication.
- * @param referralFee The referral fee associated with this publication.
- */
-struct ProfilePublicationData {
-    uint256 amount;
-    address recipient;
-    address currency;
-    uint16 referralFee;
->>>>>>> dd137b2 (Initial commit)
 }
 
 /**
  * @title FeeCollectModule
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is a simple Lens CollectModule implementation, inheriting from the ICollectModule interface and
  * the FeeCollectModuleBase abstract contract.
  *
  * This module works by allowing unlimited collects for a publication at a given price.
  */
-contract FeeCollectModule is ICollectModule, FeeModuleBase, FollowValidationModuleBase {
+contract FeeCollectModule is FeeModuleBase, FollowValidationModuleBase, ICollectModule {
     using SafeERC20 for IERC20;
 
     mapping(uint256 => mapping(uint256 => ProfilePublicationData))
@@ -71,21 +55,15 @@ contract FeeCollectModule is ICollectModule, FeeModuleBase, FollowValidationModu
      *      address currency: The currency address, must be internally whitelisted.
      *      address recipient: The custom recipient address to direct earnings to.
      *      uint16 referralFee: The referral fee to set.
-<<<<<<< HEAD
      *      bool followerOnly: Whether only followers should be able to collect.
      *
      * @return bytes An abi encoded bytes parameter, which is the same as the passed data parameter.
-=======
-     *
-     * @return An abi encoded bytes parameter, which is the same as the passed data parameter.
->>>>>>> dd137b2 (Initial commit)
      */
     function initializePublicationCollectModule(
         uint256 profileId,
         uint256 pubId,
         bytes calldata data
     ) external override onlyHub returns (bytes memory) {
-<<<<<<< HEAD
         (
             uint256 amount,
             address currency,
@@ -93,17 +71,10 @@ contract FeeCollectModule is ICollectModule, FeeModuleBase, FollowValidationModu
             uint16 referralFee,
             bool followerOnly
         ) = abi.decode(data, (uint256, address, address, uint16, bool));
-=======
-        (uint256 amount, address currency, address recipient, uint16 referralFee) = abi.decode(
-            data,
-            (uint256, address, address, uint16)
-        );
->>>>>>> dd137b2 (Initial commit)
         if (
             !_currencyWhitelisted(currency) ||
             recipient == address(0) ||
             referralFee > BPS_MAX ||
-<<<<<<< HEAD
             amount == 0
         ) revert Errors.InitParamsInvalid();
 
@@ -112,15 +83,6 @@ contract FeeCollectModule is ICollectModule, FeeModuleBase, FollowValidationModu
         _dataByPublicationByProfile[profileId][pubId].recipient = recipient;
         _dataByPublicationByProfile[profileId][pubId].referralFee = referralFee;
         _dataByPublicationByProfile[profileId][pubId].followerOnly = followerOnly;
-=======
-            amount < BPS_MAX
-        ) revert Errors.InitParamsInvalid();
-
-        _dataByPublicationByProfile[profileId][pubId].referralFee = referralFee;
-        _dataByPublicationByProfile[profileId][pubId].recipient = recipient;
-        _dataByPublicationByProfile[profileId][pubId].currency = currency;
-        _dataByPublicationByProfile[profileId][pubId].amount = amount;
->>>>>>> dd137b2 (Initial commit)
 
         return data;
     }
@@ -137,12 +99,8 @@ contract FeeCollectModule is ICollectModule, FeeModuleBase, FollowValidationModu
         uint256 pubId,
         bytes calldata data
     ) external virtual override onlyHub {
-<<<<<<< HEAD
         if (_dataByPublicationByProfile[profileId][pubId].followerOnly)
             _checkFollowValidity(profileId, collector);
-=======
-        _checkFollowValidity(profileId, collector);
->>>>>>> dd137b2 (Initial commit)
         if (referrerProfileId == profileId) {
             _processCollect(collector, profileId, pubId, data);
         } else {
@@ -157,11 +115,7 @@ contract FeeCollectModule is ICollectModule, FeeModuleBase, FollowValidationModu
      * @param profileId The token ID of the profile mapped to the publication to query.
      * @param pubId The publication ID of the publication to query.
      *
-<<<<<<< HEAD
      * @return ProfilePublicationData The ProfilePublicationData struct mapped to that publication.
-=======
-     * @return The ProfilePublicationData struct mapped to that publication.
->>>>>>> dd137b2 (Initial commit)
      */
     function getPublicationData(uint256 profileId, uint256 pubId)
         external
@@ -187,12 +141,8 @@ contract FeeCollectModule is ICollectModule, FeeModuleBase, FollowValidationModu
         uint256 adjustedAmount = amount - treasuryAmount;
 
         IERC20(currency).safeTransferFrom(collector, recipient, adjustedAmount);
-<<<<<<< HEAD
         if (treasuryAmount > 0)
             IERC20(currency).safeTransferFrom(collector, treasury, treasuryAmount);
-=======
-        IERC20(currency).safeTransferFrom(collector, treasury, treasuryAmount);
->>>>>>> dd137b2 (Initial commit)
     }
 
     function _processCollectWithReferral(
@@ -232,11 +182,7 @@ contract FeeCollectModule is ICollectModule, FeeModuleBase, FollowValidationModu
         address recipient = _dataByPublicationByProfile[profileId][pubId].recipient;
 
         IERC20(currency).safeTransferFrom(collector, recipient, adjustedAmount);
-<<<<<<< HEAD
         if (treasuryAmount > 0)
             IERC20(currency).safeTransferFrom(collector, treasury, treasuryAmount);
-=======
-        IERC20(currency).safeTransferFrom(collector, treasury, treasuryAmount);
->>>>>>> dd137b2 (Initial commit)
     }
 }

@@ -1,6 +1,7 @@
 .env
 #Hardhat files
 cache
+.dccache
 artifacts
 node_modules
 dist/
@@ -15,26 +16,14 @@ build/
 /tasks/post.ts
 /tasks/follow.ts
 /tasks/collect.ts
-<<<<<<< HEAD
 /tasks/test-module.ts
-=======
-/tasks/create-module.ts
-/tasks/module-flow.ts
->>>>>>> dd137b2 (Initial commit)
-
 /coverage
 coverage.json
 .coverage_artifacts
 .coverage_cache
 .coverage_contracts
-
-<<<<<<< HEAD
 addresses.json
-
 contracts/core/modules/follow/SecretCodeFollowModule.sol
-.dccache
-/node_modules
-.devcontainer/devcontainer.json
-=======
-addresses.json
->>>>>>> dd137b2 (Initial commit)
+.github/.DS_Store
+.DS_Store
+.gitignore

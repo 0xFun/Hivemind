@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -6,11 +6,7 @@ import {DataTypes} from '../libraries/DataTypes.sol';
 
 /**
  * @title ILensNFTBase
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is the interface for the LensNFTBase contract, from which all Lens NFTs inherit.
  * It is an expansion of a very slightly modified ERC721Enumerable contract, which allows expanded
@@ -68,11 +64,7 @@ interface ILensNFTBase {
     /**
      * @notice Returns the domain separator for this NFT contract.
      *
-<<<<<<< HEAD
      * @return bytes32 The domain separator.
-=======
-     * @return The domain separator.
->>>>>>> dd137b2 (Initial commit)
      */
     function getDomainSeparator() external view returns (bytes32);
 }

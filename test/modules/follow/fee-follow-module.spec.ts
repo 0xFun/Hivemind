@@ -41,7 +41,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
   context('Negatives', function () {
     context('Initialization', function () {
       it('user should fail to create a profile with fee follow module using unwhitelisted currency', async function () {
-        const followModuleData = abiCoder.encode(
+        const followModuleInitData = abiCoder.encode(
           ['uint256', 'address', 'address'],
           [DEFAULT_FOLLOW_PRICE, userTwoAddress, userAddress]
         );
@@ -52,14 +52,14 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
             handle: MOCK_PROFILE_HANDLE,
             imageURI: MOCK_PROFILE_URI,
             followModule: feeFollowModule.address,
-            followModuleData: followModuleData,
+            followModuleInitData: followModuleInitData,
             followNFTURI: MOCK_FOLLOW_NFT_URI,
           })
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
       });
 
       it('user should fail to create a profile with fee follow module using zero recipient', async function () {
-        const followModuleData = abiCoder.encode(
+        const followModuleInitData = abiCoder.encode(
           ['uint256', 'address', 'address'],
           [DEFAULT_FOLLOW_PRICE, currency.address, ZERO_ADDRESS]
         );
@@ -70,23 +70,16 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
             handle: MOCK_PROFILE_HANDLE,
             imageURI: MOCK_PROFILE_URI,
             followModule: feeFollowModule.address,
-            followModuleData: followModuleData,
+            followModuleInitData: followModuleInitData,
             followNFTURI: MOCK_FOLLOW_NFT_URI,
           })
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
       });
 
-<<<<<<< HEAD
       it('user should fail to create a profile with fee follow module using zero amount', async function () {
-        const followModuleData = abiCoder.encode(
+        const followModuleInitData = abiCoder.encode(
           ['uint256', 'address', 'address'],
           [0, currency.address, userAddress]
-=======
-      it('user should fail to create a profile with fee follow module using amount lower than max BPS', async function () {
-        const followModuleData = abiCoder.encode(
-          ['uint256', 'address', 'address'],
-          [9999, currency.address, userAddress]
->>>>>>> dd137b2 (Initial commit)
         );
 
         await expect(
@@ -95,7 +88,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
             handle: MOCK_PROFILE_HANDLE,
             imageURI: MOCK_PROFILE_URI,
             followModule: feeFollowModule.address,
-            followModuleData: followModuleData,
+            followModuleInitData: followModuleInitData,
             followNFTURI: MOCK_FOLLOW_NFT_URI,
           })
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
@@ -104,7 +97,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
 
     context('Following', function () {
       beforeEach(async function () {
-        const followModuleData = abiCoder.encode(
+        const followModuleInitData = abiCoder.encode(
           ['uint256', 'address', 'address'],
           [DEFAULT_FOLLOW_PRICE, currency.address, userAddress]
         );
@@ -114,13 +107,18 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
             handle: MOCK_PROFILE_HANDLE,
             imageURI: MOCK_PROFILE_URI,
             followModule: feeFollowModule.address,
-            followModuleData: followModuleData,
+            followModuleInitData: followModuleInitData,
             followNFTURI: MOCK_FOLLOW_NFT_URI,
           })
         ).to.not.be.reverted;
       });
 
-<<<<<<< HEAD
+      it('UserTwo should fail to process follow without being the hub', async function () {
+        await expect(
+          feeFollowModule.connect(userTwo).processFollow(userTwoAddress, FIRST_PROFILE_ID, [])
+        ).to.be.revertedWith(ERRORS.NOT_HUB);
+      });
+
       it('Governance should set the treasury fee BPS to zero, userTwo following should not emit a transfer event to the treasury', async function () {
         await expect(moduleGlobals.connect(governance).setTreasuryFee(0)).to.not.be.reverted;
         const data = abiCoder.encode(
@@ -151,8 +149,6 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
         );
       });
 
-=======
->>>>>>> dd137b2 (Initial commit)
       it('UserTwo should fail to follow passing a different expected price in data', async function () {
         const data = abiCoder.encode(
           ['address', 'uint256'],
@@ -179,18 +175,14 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
         );
         await expect(
           lensHub.connect(userTwo).follow([FIRST_PROFILE_ID], [data])
-<<<<<<< HEAD
         ).to.be.revertedWith(ERRORS.ERC20_INSUFFICIENT_ALLOWANCE);
-=======
-        ).to.be.revertedWith(ERRORS.ERC20_TRANSFER_EXCEEDS_ALLOWANCE);
->>>>>>> dd137b2 (Initial commit)
       });
     });
   });
 
   context('Scenarios', function () {
     it('User should create a profile with the fee follow module as the follow module and data, correct events should be emitted', async function () {
-      const followModuleData = abiCoder.encode(
+      const followModuleInitData = abiCoder.encode(
         ['uint256', 'address', 'address'],
         [DEFAULT_FOLLOW_PRICE, currency.address, userAddress]
       );
@@ -199,7 +191,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
         handle: MOCK_PROFILE_HANDLE,
         imageURI: MOCK_PROFILE_URI,
         followModule: feeFollowModule.address,
-        followModuleData: followModuleData,
+        followModuleInitData: followModuleInitData,
         followNFTURI: MOCK_FOLLOW_NFT_URI,
       });
 
@@ -214,7 +206,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
         MOCK_PROFILE_HANDLE,
         MOCK_PROFILE_URI,
         feeFollowModule.address,
-        followModuleData,
+        followModuleInitData,
         MOCK_FOLLOW_NFT_URI,
         await getTimestamp(),
       ]);
@@ -227,19 +219,19 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
 
-      const followModuleData = abiCoder.encode(
+      const followModuleInitData = abiCoder.encode(
         ['uint256', 'address', 'address'],
         [DEFAULT_FOLLOW_PRICE, currency.address, userAddress]
       );
       const tx = lensHub.setFollowModule(
         FIRST_PROFILE_ID,
         feeFollowModule.address,
-        followModuleData
+        followModuleInitData
       );
 
       const receipt = await waitForTx(tx);
@@ -248,13 +240,13 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
       matchEvent(receipt, 'FollowModuleSet', [
         FIRST_PROFILE_ID,
         feeFollowModule.address,
-        followModuleData,
+        followModuleInitData,
         await getTimestamp(),
       ]);
     });
 
     it('User should create a profile with the fee follow module as the follow module and data, fetched profile data should be accurate', async function () {
-      const followModuleData = abiCoder.encode(
+      const followModuleInitData = abiCoder.encode(
         ['uint256', 'address', 'address'],
         [DEFAULT_FOLLOW_PRICE, currency.address, userAddress]
       );
@@ -264,7 +256,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: feeFollowModule.address,
-          followModuleData: followModuleData,
+          followModuleInitData: followModuleInitData,
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -276,7 +268,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
     });
 
     it('User should create a profile with the fee follow module as the follow module and data, user two follows, fee distribution is valid', async function () {
-      const followModuleData = abiCoder.encode(
+      const followModuleInitData = abiCoder.encode(
         ['uint256', 'address', 'address'],
         [DEFAULT_FOLLOW_PRICE, currency.address, userAddress]
       );
@@ -286,7 +278,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: feeFollowModule.address,
-          followModuleData: followModuleData,
+          followModuleInitData: followModuleInitData,
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -315,7 +307,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
     });
 
     it('User should create a profile with the fee follow module as the follow module and data, user two follows twice, fee distribution is valid', async function () {
-      const followModuleData = abiCoder.encode(
+      const followModuleInitData = abiCoder.encode(
         ['uint256', 'address', 'address'],
         [DEFAULT_FOLLOW_PRICE, currency.address, userAddress]
       );
@@ -325,7 +317,7 @@ makeSuiteCleanRoom('Fee Follow Module', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: feeFollowModule.address,
-          followModuleData: followModuleData,
+          followModuleInitData: followModuleInitData,
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;

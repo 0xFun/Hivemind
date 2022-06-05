@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -9,16 +9,12 @@ import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 
 /**
  * @title FollowerOnlyReferenceModule
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice A simple reference module that validates that comments or mirrors originate from a profile owned
  * by a follower.
  */
-contract FollowerOnlyReferenceModule is IReferenceModule, FollowValidationModuleBase {
+contract FollowerOnlyReferenceModule is FollowValidationModuleBase, IReferenceModule {
     constructor(address hub) ModuleBase(hub) {}
 
     /**
@@ -40,7 +36,8 @@ contract FollowerOnlyReferenceModule is IReferenceModule, FollowValidationModule
     function processComment(
         uint256 profileId,
         uint256 profileIdPointed,
-        uint256 pubIdPointed
+        uint256 pubIdPointed,
+        bytes calldata data
     ) external view override {
         address commentCreator = IERC721(HUB).ownerOf(profileId);
         _checkFollowValidity(profileIdPointed, commentCreator);
@@ -54,7 +51,8 @@ contract FollowerOnlyReferenceModule is IReferenceModule, FollowValidationModule
     function processMirror(
         uint256 profileId,
         uint256 profileIdPointed,
-        uint256 pubIdPointed
+        uint256 pubIdPointed,
+        bytes calldata data
     ) external view override {
         address mirrorCreator = IERC721(HUB).ownerOf(profileId);
         _checkFollowValidity(profileIdPointed, mirrorCreator);

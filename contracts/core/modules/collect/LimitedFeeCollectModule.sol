@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -17,47 +17,31 @@ import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
  * @param collectLimit The maximum number of collects for this publication.
  * @param currentCollects The current number of collects for this publication.
  * @param amount The collecting cost associated with this publication.
-<<<<<<< HEAD
  * @param currency The currency associated with this publication.
  * @param recipient The recipient address associated with this publication.
  * @param referralFee The referral fee associated with this publication.
  * @param followerOnly Whether only followers should be able to collect.
-=======
- * @param recipient The recipient address associated with this publication.
- * @param currency The currency associated with this publication.
- * @param referralFee The referral fee associated with this publication.
->>>>>>> dd137b2 (Initial commit)
  */
 struct ProfilePublicationData {
     uint256 collectLimit;
     uint256 currentCollects;
     uint256 amount;
-<<<<<<< HEAD
     address currency;
     address recipient;
     uint16 referralFee;
     bool followerOnly;
-=======
-    address recipient;
-    address currency;
-    uint16 referralFee;
->>>>>>> dd137b2 (Initial commit)
 }
 
 /**
  * @title LimitedFeeCollectModule
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is a simple Lens CollectModule implementation, inheriting from the ICollectModule interface and
  * the FeeCollectModuleBase abstract contract.
  *
  * This module works by allowing limited collects for a publication indefinitely.
  */
-contract LimitedFeeCollectModule is ICollectModule, FeeModuleBase, FollowValidationModuleBase {
+contract LimitedFeeCollectModule is FeeModuleBase, FollowValidationModuleBase, ICollectModule {
     using SafeERC20 for IERC20;
 
     mapping(uint256 => mapping(uint256 => ProfilePublicationData))
@@ -68,25 +52,17 @@ contract LimitedFeeCollectModule is ICollectModule, FeeModuleBase, FollowValidat
     /**
      * @notice This collect module levies a fee on collects and supports referrals. Thus, we need to decode data.
      *
-<<<<<<< HEAD
      * @param profileId The profile ID of the publication to initialize this module for's publishing profile.
      * @param pubId The publication ID of the publication to initialize this module for.
-=======
->>>>>>> dd137b2 (Initial commit)
      * @param data The arbitrary data parameter, decoded into:
      *      uint256 collectLimit: The maximum amount of collects.
      *      uint256 amount: The currency total amount to levy.
      *      address currency: The currency address, must be internally whitelisted.
      *      address recipient: The custom recipient address to direct earnings to.
      *      uint16 referralFee: The referral fee to set.
-<<<<<<< HEAD
      *      bool followerOnly: Whether only followers should be able to collect.
      *
      * @return bytes An abi encoded bytes parameter, which is the same as the passed data parameter.
-=======
-     *
-     * @return An abi encoded bytes parameter, which is the same as the passed data parameter.
->>>>>>> dd137b2 (Initial commit)
      */
     function initializePublicationCollectModule(
         uint256 profileId,
@@ -98,24 +74,15 @@ contract LimitedFeeCollectModule is ICollectModule, FeeModuleBase, FollowValidat
             uint256 amount,
             address currency,
             address recipient,
-<<<<<<< HEAD
             uint16 referralFee,
             bool followerOnly
         ) = abi.decode(data, (uint256, uint256, address, address, uint16, bool));
-=======
-            uint16 referralFee
-        ) = abi.decode(data, (uint256, uint256, address, address, uint16));
->>>>>>> dd137b2 (Initial commit)
         if (
             collectLimit == 0 ||
             !_currencyWhitelisted(currency) ||
             recipient == address(0) ||
             referralFee > BPS_MAX ||
-<<<<<<< HEAD
             amount == 0
-=======
-            amount < BPS_MAX
->>>>>>> dd137b2 (Initial commit)
         ) revert Errors.InitParamsInvalid();
 
         _dataByPublicationByProfile[profileId][pubId].collectLimit = collectLimit;
@@ -123,10 +90,7 @@ contract LimitedFeeCollectModule is ICollectModule, FeeModuleBase, FollowValidat
         _dataByPublicationByProfile[profileId][pubId].currency = currency;
         _dataByPublicationByProfile[profileId][pubId].recipient = recipient;
         _dataByPublicationByProfile[profileId][pubId].referralFee = referralFee;
-<<<<<<< HEAD
         _dataByPublicationByProfile[profileId][pubId].followerOnly = followerOnly;
-=======
->>>>>>> dd137b2 (Initial commit)
 
         return data;
     }
@@ -144,24 +108,15 @@ contract LimitedFeeCollectModule is ICollectModule, FeeModuleBase, FollowValidat
         uint256 pubId,
         bytes calldata data
     ) external override onlyHub {
-<<<<<<< HEAD
         if (_dataByPublicationByProfile[profileId][pubId].followerOnly)
             _checkFollowValidity(profileId, collector);
-=======
-        _checkFollowValidity(profileId, collector);
-
->>>>>>> dd137b2 (Initial commit)
         if (
             _dataByPublicationByProfile[profileId][pubId].currentCollects >=
             _dataByPublicationByProfile[profileId][pubId].collectLimit
         ) {
             revert Errors.MintLimitExceeded();
         } else {
-<<<<<<< HEAD
             ++_dataByPublicationByProfile[profileId][pubId].currentCollects;
-=======
-            _dataByPublicationByProfile[profileId][pubId].currentCollects++;
->>>>>>> dd137b2 (Initial commit)
             if (referrerProfileId == profileId) {
                 _processCollect(collector, profileId, pubId, data);
             } else {
@@ -177,11 +132,7 @@ contract LimitedFeeCollectModule is ICollectModule, FeeModuleBase, FollowValidat
      * @param profileId The token ID of the profile mapped to the publication to query.
      * @param pubId The publication ID of the publication to query.
      *
-<<<<<<< HEAD
      * @return ProfilePublicationData The ProfilePublicationData struct mapped to that publication.
-=======
-     * @return The ProfilePublicationData struct mapped to that publication.
->>>>>>> dd137b2 (Initial commit)
      */
     function getPublicationData(uint256 profileId, uint256 pubId)
         external
@@ -207,12 +158,8 @@ contract LimitedFeeCollectModule is ICollectModule, FeeModuleBase, FollowValidat
         uint256 adjustedAmount = amount - treasuryAmount;
 
         IERC20(currency).safeTransferFrom(collector, recipient, adjustedAmount);
-<<<<<<< HEAD
         if (treasuryAmount > 0)
             IERC20(currency).safeTransferFrom(collector, treasury, treasuryAmount);
-=======
-        IERC20(currency).safeTransferFrom(collector, treasury, treasuryAmount);
->>>>>>> dd137b2 (Initial commit)
     }
 
     function _processCollectWithReferral(
@@ -252,11 +199,7 @@ contract LimitedFeeCollectModule is ICollectModule, FeeModuleBase, FollowValidat
         address recipient = _dataByPublicationByProfile[profileId][pubId].recipient;
 
         IERC20(currency).safeTransferFrom(collector, recipient, adjustedAmount);
-<<<<<<< HEAD
         if (treasuryAmount > 0)
             IERC20(currency).safeTransferFrom(collector, treasury, treasuryAmount);
-=======
-        IERC20(currency).safeTransferFrom(collector, treasury, treasuryAmount);
->>>>>>> dd137b2 (Initial commit)
     }
 }

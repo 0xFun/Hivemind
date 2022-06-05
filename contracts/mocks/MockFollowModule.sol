@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -22,7 +22,6 @@ contract MockFollowModule is IFollowModule {
         bytes calldata data
     ) external override {}
 
-<<<<<<< HEAD
     function isFollowing(
         uint256 profileId,
         address follower,
@@ -30,13 +29,6 @@ contract MockFollowModule is IFollowModule {
     ) external view override returns (bool) {
         return true;
     }
-=======
-    function validateFollow(
-        uint256 profileId,
-        address follower,
-        uint256 followNFTTokenId
-    ) external view override {}
->>>>>>> dd137b2 (Initial commit)
 
     function followModuleTransferHook(
         uint256 profileId,

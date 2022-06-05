@@ -38,7 +38,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
         handle: MOCK_PROFILE_HANDLE,
         imageURI: MOCK_PROFILE_URI,
         followModule: ZERO_ADDRESS,
-        followModuleData: [],
+        followModuleInitData: [],
         followNFTURI: MOCK_FOLLOW_NFT_URI,
       })
     ).to.not.be.reverted;
@@ -53,44 +53,32 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
   context('Negatives', function () {
     context('Publication Creation', function () {
       it('user should fail to post with limited fee collect module using zero collect limit', async function () {
-        const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+        const collectModuleInitData = abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
           [0, DEFAULT_COLLECT_PRICE, currency.address, userAddress, REFERRAL_FEE_BPS, true]
-=======
-          ['uint256', 'uint256', 'address', 'address', 'uint16'],
-          [0, DEFAULT_COLLECT_PRICE, currency.address, userAddress, REFERRAL_FEE_BPS]
->>>>>>> dd137b2 (Initial commit)
         );
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: limitedFeeCollectModule.address,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
       });
 
       it('user should fail to post with limited fee collect module using unwhitelisted currency', async function () {
-        const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+        const collectModuleInitData = abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
-=======
-          ['uint256', 'uint256', 'address', 'address', 'uint16'],
->>>>>>> dd137b2 (Initial commit)
           [
             DEFAULT_COLLECT_LIMIT,
             DEFAULT_COLLECT_PRICE,
             userTwoAddress,
             userAddress,
             REFERRAL_FEE_BPS,
-<<<<<<< HEAD
             true,
-=======
->>>>>>> dd137b2 (Initial commit)
           ]
         );
         await expect(
@@ -98,30 +86,23 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: limitedFeeCollectModule.address,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
       });
 
       it('user should fail to post with limited fee collect module using zero recipient', async function () {
-        const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+        const collectModuleInitData = abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
-=======
-          ['uint256', 'uint256', 'address', 'address', 'uint16'],
->>>>>>> dd137b2 (Initial commit)
           [
             DEFAULT_COLLECT_LIMIT,
             DEFAULT_COLLECT_PRICE,
             currency.address,
             ZERO_ADDRESS,
             REFERRAL_FEE_BPS,
-<<<<<<< HEAD
             true,
-=======
->>>>>>> dd137b2 (Initial commit)
           ]
         );
         await expect(
@@ -129,55 +110,43 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: limitedFeeCollectModule.address,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
       });
 
       it('user should fail to post with limited fee collect module using referral fee greater than max BPS', async function () {
-        const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+        const collectModuleInitData = abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
           [DEFAULT_COLLECT_LIMIT, DEFAULT_COLLECT_PRICE, currency.address, userAddress, 10001, true]
-=======
-          ['uint256', 'uint256', 'address', 'address', 'uint16'],
-          [DEFAULT_COLLECT_LIMIT, DEFAULT_COLLECT_PRICE, currency.address, userAddress, 10001]
->>>>>>> dd137b2 (Initial commit)
         );
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: limitedFeeCollectModule.address,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
       });
 
-<<<<<<< HEAD
       it('user should fail to post with limited fee collect module using zero amount', async function () {
-        const collectModuleData = abiCoder.encode(
+        const collectModuleInitData = abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
           [DEFAULT_COLLECT_LIMIT, 0, currency.address, userAddress, REFERRAL_FEE_BPS, true]
-=======
-      it('user should fail to post with limited fee collect module using amount lower than max BPS', async function () {
-        const collectModuleData = abiCoder.encode(
-          ['uint256', 'uint256', 'address', 'address', 'uint16'],
-          [DEFAULT_COLLECT_LIMIT, 9999, currency.address, userAddress, REFERRAL_FEE_BPS]
->>>>>>> dd137b2 (Initial commit)
         );
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: limitedFeeCollectModule.address,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.INIT_PARAMS_INVALID);
       });
@@ -185,22 +154,15 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
     context('Collecting', function () {
       beforeEach(async function () {
-        const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+        const collectModuleInitData = abiCoder.encode(
           ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
-=======
-          ['uint256', 'uint256', 'address', 'address', 'uint16'],
->>>>>>> dd137b2 (Initial commit)
           [
             DEFAULT_COLLECT_LIMIT,
             DEFAULT_COLLECT_PRICE,
             currency.address,
             userAddress,
             REFERRAL_FEE_BPS,
-<<<<<<< HEAD
             true,
-=======
->>>>>>> dd137b2 (Initial commit)
           ]
         );
         await expect(
@@ -208,14 +170,21 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: limitedFeeCollectModule.address,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
       });
 
-<<<<<<< HEAD
+      it('UserTwo should fail to process collect without being the hub', async function () {
+        await expect(
+          limitedFeeCollectModule
+            .connect(userTwo)
+            .processCollect(0, userTwoAddress, FIRST_PROFILE_ID, 1, [])
+        ).to.be.revertedWith(ERRORS.NOT_HUB);
+      });
+
       it('Governance should set the treasury fee BPS to zero, userTwo collecting should not emit a transfer event to the treasury', async function () {
         await expect(moduleGlobals.connect(governance).setTreasuryFee(0)).to.not.be.reverted;
         const data = abiCoder.encode(
@@ -256,7 +225,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             handle: 'usertwo',
             imageURI: MOCK_PROFILE_URI,
             followModule: ZERO_ADDRESS,
-            followModuleData: [],
+            followModuleInitData: [],
             followNFTURI: MOCK_FOLLOW_NFT_URI,
           })
         ).to.not.be.reverted;
@@ -265,8 +234,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             profileId: secondProfileId,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
@@ -315,8 +285,6 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
         );
       });
 
-=======
->>>>>>> dd137b2 (Initial commit)
       it('UserTwo should fail to collect without following', async function () {
         const data = abiCoder.encode(
           ['address', 'uint256'],
@@ -359,11 +327,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
         );
         await expect(
           lensHub.connect(userTwo).collect(FIRST_PROFILE_ID, 1, data)
-<<<<<<< HEAD
         ).to.be.revertedWith(ERRORS.ERC20_INSUFFICIENT_ALLOWANCE);
-=======
-        ).to.be.revertedWith(ERRORS.ERC20_TRANSFER_EXCEEDS_ALLOWANCE);
->>>>>>> dd137b2 (Initial commit)
       });
 
       it('UserTwo should mirror the original post, fail to collect from their mirror without following the original profile', async function () {
@@ -374,7 +338,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             handle: 'usertwo',
             imageURI: MOCK_PROFILE_URI,
             followModule: ZERO_ADDRESS,
-            followModuleData: [],
+            followModuleInitData: [],
             followNFTURI: MOCK_FOLLOW_NFT_URI,
           })
         ).to.not.be.reverted;
@@ -383,8 +347,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             profileId: secondProfileId,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
@@ -405,7 +370,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             handle: 'usertwo',
             imageURI: MOCK_PROFILE_URI,
             followModule: ZERO_ADDRESS,
-            followModuleData: [],
+            followModuleInitData: [],
             followNFTURI: MOCK_FOLLOW_NFT_URI,
           })
         ).to.not.be.reverted;
@@ -414,8 +379,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             profileId: secondProfileId,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
@@ -437,7 +403,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             handle: 'usertwo',
             imageURI: MOCK_PROFILE_URI,
             followModule: ZERO_ADDRESS,
-            followModuleData: [],
+            followModuleInitData: [],
             followNFTURI: MOCK_FOLLOW_NFT_URI,
           })
         ).to.not.be.reverted;
@@ -446,8 +412,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
             profileId: secondProfileId,
             profileIdPointed: FIRST_PROFILE_ID,
             pubIdPointed: 1,
-            referenceModule: ZERO_ADDRESS,
             referenceModuleData: [],
+            referenceModule: ZERO_ADDRESS,
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
@@ -462,31 +429,24 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
   context('Scenarios', function () {
     it('User should post with limited fee collect module as the collect module and data, correct events should be emitted', async function () {
-      const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+      const collectModuleInitData = abiCoder.encode(
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
-=======
-        ['uint256', 'uint256', 'address', 'address', 'uint16'],
->>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
-<<<<<<< HEAD
           true,
-=======
->>>>>>> dd137b2 (Initial commit)
         ]
       );
       const tx = lensHub.post({
         profileId: FIRST_PROFILE_ID,
         contentURI: MOCK_URI,
         collectModule: limitedFeeCollectModule.address,
-        collectModuleData: collectModuleData,
+        collectModuleInitData: collectModuleInitData,
         referenceModule: ZERO_ADDRESS,
-        referenceModuleData: [],
+        referenceModuleInitData: [],
       });
 
       const receipt = await waitForTx(tx);
@@ -497,7 +457,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
         1,
         MOCK_URI,
         limitedFeeCollectModule.address,
-        collectModuleData,
+        collectModuleInitData,
         ZERO_ADDRESS,
         [],
         await getTimestamp(),
@@ -505,22 +465,15 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
     });
 
     it('User should post with limited fee collect module as the collect module and data, fetched publication data should be accurate', async function () {
-      const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+      const collectModuleInitData = abiCoder.encode(
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
-=======
-        ['uint256', 'uint256', 'address', 'address', 'uint16'],
->>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
-<<<<<<< HEAD
           true,
-=======
->>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(
@@ -528,9 +481,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
           collectModule: limitedFeeCollectModule.address,
-          collectModuleData: collectModuleData,
+          collectModuleInitData: collectModuleInitData,
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -540,12 +493,11 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
       expect(fetchedData.recipient).to.eq(userAddress);
       expect(fetchedData.currency).to.eq(currency.address);
       expect(fetchedData.referralFee).to.eq(REFERRAL_FEE_BPS);
-<<<<<<< HEAD
       expect(fetchedData.followerOnly).to.eq(true);
     });
 
     it('User should post with limited fee collect module as the collect module and data, allowing non-followers to collect, user two collects without following and pays fee, fee distribution is valid', async function () {
-      const collectModuleData = abiCoder.encode(
+      const collectModuleInitData = abiCoder.encode(
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
         [
           DEFAULT_COLLECT_LIMIT,
@@ -561,9 +513,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
           collectModule: limitedFeeCollectModule.address,
-          collectModuleData: collectModuleData,
+          collectModuleInitData: collectModuleInitData,
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -588,27 +540,18 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
       );
       expect(await currency.balanceOf(userAddress)).to.eq(expectedRecipientAmount);
       expect(await currency.balanceOf(treasuryAddress)).to.eq(expectedTreasuryAmount);
-=======
->>>>>>> dd137b2 (Initial commit)
     });
 
     it('User should post with limited fee collect module as the collect module and data, user two follows, then collects and pays fee, fee distribution is valid', async function () {
-      const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+      const collectModuleInitData = abiCoder.encode(
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
-=======
-        ['uint256', 'uint256', 'address', 'address', 'uint16'],
->>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
-<<<<<<< HEAD
           true,
-=======
->>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(
@@ -616,9 +559,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
           collectModule: limitedFeeCollectModule.address,
-          collectModuleData: collectModuleData,
+          collectModuleInitData: collectModuleInitData,
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -647,22 +590,15 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
     });
 
     it('User should post with limited fee collect module as the collect module and data, user two follows, then collects twice, fee distribution is valid', async function () {
-      const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+      const collectModuleInitData = abiCoder.encode(
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
-=======
-        ['uint256', 'uint256', 'address', 'address', 'uint16'],
->>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
-<<<<<<< HEAD
           true,
-=======
->>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(
@@ -670,9 +606,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
           collectModule: limitedFeeCollectModule.address,
-          collectModuleData: collectModuleData,
+          collectModuleInitData: collectModuleInitData,
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -703,22 +639,15 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
     it('User should post with limited fee collect module as the collect module and data, user two mirrors, follows, then collects from their mirror and pays fee, fee distribution is valid', async function () {
       const secondProfileId = FIRST_PROFILE_ID + 1;
-      const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+      const collectModuleInitData = abiCoder.encode(
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
-=======
-        ['uint256', 'uint256', 'address', 'address', 'uint16'],
->>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
-<<<<<<< HEAD
           true,
-=======
->>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(
@@ -726,9 +655,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
           collectModule: limitedFeeCollectModule.address,
-          collectModuleData: collectModuleData,
+          collectModuleInitData: collectModuleInitData,
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -738,7 +667,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           handle: 'usertwo',
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -747,8 +676,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           profileId: secondProfileId,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -784,23 +714,18 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
     it('User should post with limited fee collect module as the collect module and data, with no referral fee, user two mirrors, follows, then collects from their mirror and pays fee, fee distribution is valid', async function () {
       const secondProfileId = FIRST_PROFILE_ID + 1;
-      const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+      const collectModuleInitData = abiCoder.encode(
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
         [DEFAULT_COLLECT_LIMIT, DEFAULT_COLLECT_PRICE, currency.address, userAddress, 0, true]
-=======
-        ['uint256', 'uint256', 'address', 'address', 'uint16'],
-        [DEFAULT_COLLECT_LIMIT, DEFAULT_COLLECT_PRICE, currency.address, userAddress, 0]
->>>>>>> dd137b2 (Initial commit)
       );
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
           collectModule: limitedFeeCollectModule.address,
-          collectModuleData: collectModuleData,
+          collectModuleInitData: collectModuleInitData,
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -810,7 +735,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           handle: 'usertwo',
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -819,8 +744,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           profileId: secondProfileId,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -850,22 +776,15 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
 
     it('User should post with limited fee collect module as the collect module and data, user two mirrors, follows, then collects once from the original, twice from the mirror, and fails to collect a third time from either the mirror or the original', async function () {
       const secondProfileId = FIRST_PROFILE_ID + 1;
-      const collectModuleData = abiCoder.encode(
-<<<<<<< HEAD
+      const collectModuleInitData = abiCoder.encode(
         ['uint256', 'uint256', 'address', 'address', 'uint16', 'bool'],
-=======
-        ['uint256', 'uint256', 'address', 'address', 'uint16'],
->>>>>>> dd137b2 (Initial commit)
         [
           DEFAULT_COLLECT_LIMIT,
           DEFAULT_COLLECT_PRICE,
           currency.address,
           userAddress,
           REFERRAL_FEE_BPS,
-<<<<<<< HEAD
           true,
-=======
->>>>>>> dd137b2 (Initial commit)
         ]
       );
       await expect(
@@ -873,9 +792,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
           collectModule: limitedFeeCollectModule.address,
-          collectModuleData: collectModuleData,
+          collectModuleInitData: collectModuleInitData,
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -885,7 +804,7 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           handle: 'usertwo',
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -894,8 +813,9 @@ makeSuiteCleanRoom('Limited Fee Collect Module', function () {
           profileId: secondProfileId,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 

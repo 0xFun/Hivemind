@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -7,11 +7,7 @@ import {Errors} from '../../../libraries/Errors.sol';
 
 /**
  * @title RevertCollectModule
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This is a simple Lens CollectModule implementation, inheriting from the ICollectModule interface.
  *

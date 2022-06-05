@@ -2,11 +2,7 @@ import { HardhatUserConfig } from 'hardhat/types';
 import { accounts } from './helpers/test-wallets';
 import { eEthereumNetwork, eNetwork, ePolygonNetwork, eXDaiNetwork } from './helpers/types';
 import { HARDHATEVM_CHAINID } from './helpers/hardhat-constants';
-<<<<<<< HEAD
 import { NETWORKS_RPC_URL } from './helper-hardhat-config';
-=======
-import { NETWORKS_RPC_URL, NETWORKS_DEFAULT_GAS } from './helper-hardhat-config';
->>>>>>> dd137b2 (Initial commit)
 import dotenv from 'dotenv';
 import glob from 'glob';
 import path from 'path';
@@ -28,30 +24,14 @@ if (!process.env.SKIP_LOAD) {
 }
 
 const DEFAULT_BLOCK_GAS_LIMIT = 12450000;
-<<<<<<< HEAD
-=======
-const DEFAULT_GAS_MUL = 5;
-const HARDFORK = 'london';
->>>>>>> dd137b2 (Initial commit)
 const MNEMONIC_PATH = "m/44'/60'/0'/0";
 const MNEMONIC = process.env.MNEMONIC || '';
 const MAINNET_FORK = process.env.MAINNET_FORK === 'true';
 const TRACK_GAS = process.env.TRACK_GAS === 'true';
-<<<<<<< HEAD
-const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || '';
+const BLOCK_EXPLORER_KEY = process.env.BLOCK_EXPLORER_KEY || '';
 
 const getCommonNetworkConfig = (networkName: eNetwork, networkId: number) => ({
-  url: NETWORKS_RPC_URL[networkName],
-=======
-
-const getCommonNetworkConfig = (networkName: eNetwork, networkId: number) => ({
-  url: NETWORKS_RPC_URL[networkName],
-  hardfork: HARDFORK,
-  blockGasLimit: DEFAULT_BLOCK_GAS_LIMIT,
-  gasMultiplier: DEFAULT_GAS_MUL,
-  gasPrice: NETWORKS_DEFAULT_GAS[networkName],
-  chainId: networkId,
->>>>>>> dd137b2 (Initial commit)
+  url: NETWORKS_RPC_URL[networkName] ?? '',
   accounts: {
     mnemonic: MNEMONIC,
     path: MNEMONIC_PATH,
@@ -114,12 +94,9 @@ const config: HardhatUserConfig = {
     overwrite: false,
     runOnCompile: false,
   },
-<<<<<<< HEAD
   etherscan: {
-    apiKey: ETHERSCAN_KEY,
+    apiKey: BLOCK_EXPLORER_KEY,
   },
-=======
->>>>>>> dd137b2 (Initial commit)
 };
 
 export default config;

@@ -1,10 +1,13 @@
 import '@nomiclabs/hardhat-ethers';
 import { expect } from 'chai';
+import { BigNumber } from 'ethers';
 import { FollowNFT__factory } from '../../../typechain-types';
 import { MAX_UINT256, ZERO_ADDRESS } from '../../helpers/constants';
 import { ERRORS } from '../../helpers/errors';
 import {
   cancelWithPermitForAll,
+  expectEqualArrays,
+  followReturningTokenIds,
   getAbbreviation,
   getFollowWithSigParts,
   getTimestamp,
@@ -31,7 +34,7 @@ makeSuiteCleanRoom('Following', function () {
         handle: MOCK_PROFILE_HANDLE,
         imageURI: MOCK_PROFILE_URI,
         followModule: ZERO_ADDRESS,
-        followModuleData: [],
+        followModuleInitData: [],
         followNFTURI: MOCK_FOLLOW_NFT_URI,
       })
     ).to.not.be.reverted;
@@ -94,10 +97,13 @@ makeSuiteCleanRoom('Following', function () {
         expect(idOne).to.eq(1);
         expect(idTwo).to.eq(2);
       });
-<<<<<<< HEAD
 
       it('UserTwo should follow profile 1 3 times in the same call, receive IDs 1,2 and 3', async function () {
-        await expect(lensHub.connect(userTwo).follow([FIRST_PROFILE_ID, FIRST_PROFILE_ID, FIRST_PROFILE_ID], [[], [], []])).to.not.be.reverted;
+        await expect(
+          lensHub
+            .connect(userTwo)
+            .follow([FIRST_PROFILE_ID, FIRST_PROFILE_ID, FIRST_PROFILE_ID], [[], [], []])
+        ).to.not.be.reverted;
         const followNFTAddress = await lensHub.getFollowNFT(FIRST_PROFILE_ID);
         const followNFT = FollowNFT__factory.connect(followNFTAddress, user);
         const idOne = await followNFT.tokenOfOwnerByIndex(userTwoAddress, 0);
@@ -107,8 +113,63 @@ makeSuiteCleanRoom('Following', function () {
         expect(idTwo).to.eq(2);
         expect(idThree).to.eq(3);
       });
-=======
->>>>>>> dd137b2 (Initial commit)
+
+      it('Should return the expected token IDs when following profiles', async function () {
+        expectEqualArrays(
+          await followReturningTokenIds({
+            vars: {
+              profileIds: [FIRST_PROFILE_ID, FIRST_PROFILE_ID],
+              datas: [[], []],
+            },
+          }),
+          [1, 2]
+        );
+
+        const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const { v, r, s } = await getFollowWithSigParts(
+          [FIRST_PROFILE_ID],
+          [[]],
+          nonce,
+          MAX_UINT256
+        );
+        expectEqualArrays(
+          await followReturningTokenIds({
+            vars: {
+              follower: testWallet.address,
+              profileIds: [FIRST_PROFILE_ID],
+              datas: [[]],
+              sig: {
+                v,
+                r,
+                s,
+                deadline: MAX_UINT256,
+              },
+            },
+          }),
+          [3]
+        );
+
+        expectEqualArrays(
+          await followReturningTokenIds({
+            sender: userTwo,
+            vars: {
+              profileIds: [FIRST_PROFILE_ID],
+              datas: [[]],
+            },
+          }),
+          [4]
+        );
+
+        expectEqualArrays(
+          await followReturningTokenIds({
+            vars: {
+              profileIds: [FIRST_PROFILE_ID],
+              datas: [[]],
+            },
+          }),
+          [5]
+        );
+      });
     });
   });
 
@@ -122,11 +183,7 @@ makeSuiteCleanRoom('Following', function () {
           lensHub.followWithSig({
             follower: testWallet.address,
             profileIds: [FIRST_PROFILE_ID],
-<<<<<<< HEAD
             datas: [[]],
-=======
-            datas: [],
->>>>>>> dd137b2 (Initial commit)
             sig: {
               v,
               r,
@@ -267,11 +324,7 @@ makeSuiteCleanRoom('Following', function () {
         expect(symbol).to.eq(getAbbreviation(MOCK_PROFILE_HANDLE) + '-Fl');
       });
 
-<<<<<<< HEAD
       it('TestWallet should follow profile 1 with sig twice in the same call, receive follow NFTs with IDs 1 and 2', async function () {
-=======
-      it('TestWallet should follow profile 1 with sig twice, receive follow NFTs with IDs 1 and 2', async function () {
->>>>>>> dd137b2 (Initial commit)
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
 
         const { v, r, s } = await getFollowWithSigParts(

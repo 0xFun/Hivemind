@@ -2,13 +2,13 @@ import '@nomiclabs/hardhat-ethers';
 import { expect } from 'chai';
 import { MAX_UINT256, ZERO_ADDRESS } from '../../helpers/constants';
 import { ERRORS } from '../../helpers/errors';
-import { cancelWithPermitForAll, getPostWithSigParts } from '../../helpers/utils';
 import {
-<<<<<<< HEAD
+  cancelWithPermitForAll,
+  getPostWithSigParts,
+  postReturningTokenId,
+} from '../../helpers/utils';
+import {
   freeCollectModule,
-=======
-  emptyCollectModule,
->>>>>>> dd137b2 (Initial commit)
   FIRST_PROFILE_ID,
   governance,
   lensHub,
@@ -23,10 +23,8 @@ import {
   timedFeeCollectModule,
   userAddress,
   userTwo,
-<<<<<<< HEAD
   abiCoder,
-=======
->>>>>>> dd137b2 (Initial commit)
+  userTwoAddress,
 } from '../../__setup.spec';
 
 makeSuiteCleanRoom('Publishing Posts', function () {
@@ -38,7 +36,7 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -50,15 +48,10 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           lensHub.connect(userTwo).post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-            collectModule: emptyCollectModule.address,
-            collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.NOT_PROFILE_OWNER_OR_DISPATCHER);
       });
@@ -68,41 +61,27 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-            collectModule: emptyCollectModule.address,
-            collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.COLLECT_MODULE_NOT_WHITELISTED);
       });
 
       it('User should fail to post with an unwhitelisted reference module', async function () {
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-            collectModule: emptyCollectModule.address,
-            collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: userAddress,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.REFERENCE_MODULE_NOT_WHITELISTED);
       });
@@ -117,20 +96,16 @@ makeSuiteCleanRoom('Publishing Posts', function () {
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: timedFeeCollectModule.address,
-            collectModuleData: [0x12, 0x34],
+            collectModuleInitData: [0x12, 0x34],
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.be.revertedWith(ERRORS.NO_REASON_ABI_DECODE);
       });
 
       it('User should fail to post with invalid reference module data format', async function () {
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
@@ -141,43 +116,129 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-            collectModule: emptyCollectModule.address,
-            collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: mockReferenceModule.address,
-            referenceModuleData: [0x12, 0x23],
+            referenceModuleInitData: [0x12, 0x23],
           })
         ).to.be.revertedWith(ERRORS.NO_REASON_ABI_DECODE);
       });
     });
 
     context('Scenarios', function () {
+      it('Should return the expected token IDs when mirroring publications', async function () {
+        await expect(
+          lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
+        ).to.not.be.reverted;
+
+        await expect(
+          lensHub.createProfile({
+            to: testWallet.address,
+            handle: 'testwallet',
+            imageURI: MOCK_PROFILE_URI,
+            followModule: ZERO_ADDRESS,
+            followModuleInitData: [],
+            followNFTURI: MOCK_FOLLOW_NFT_URI,
+          })
+        ).to.not.be.reverted;
+        await expect(
+          lensHub.createProfile({
+            to: userTwoAddress,
+            handle: 'usertwo',
+            imageURI: MOCK_PROFILE_URI,
+            followModule: ZERO_ADDRESS,
+            followModuleInitData: [],
+            followNFTURI: MOCK_FOLLOW_NFT_URI,
+          })
+        ).to.not.be.reverted;
+
+        expect(
+          await postReturningTokenId({
+            vars: {
+              profileId: FIRST_PROFILE_ID,
+              contentURI: MOCK_URI,
+              collectModule: freeCollectModule.address,
+              collectModuleInitData: abiCoder.encode(['bool'], [true]),
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: [],
+            },
+          })
+        ).to.eq(1);
+
+        expect(
+          await postReturningTokenId({
+            sender: userTwo,
+            vars: {
+              profileId: FIRST_PROFILE_ID + 2,
+              contentURI: MOCK_URI,
+              collectModule: freeCollectModule.address,
+              collectModuleInitData: abiCoder.encode(['bool'], [true]),
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: [],
+            },
+          })
+        ).to.eq(1);
+
+        const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
+        const referenceModuleData = [];
+        const { v, r, s } = await getPostWithSigParts(
+          FIRST_PROFILE_ID + 1,
+          MOCK_URI,
+          freeCollectModule.address,
+          collectModuleInitData,
+          ZERO_ADDRESS,
+          referenceModuleInitData,
+          nonce,
+          MAX_UINT256
+        );
+        expect(
+          await postReturningTokenId({
+            vars: {
+              profileId: FIRST_PROFILE_ID + 1,
+              contentURI: MOCK_URI,
+              collectModule: freeCollectModule.address,
+              collectModuleInitData: collectModuleInitData,
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: referenceModuleInitData,
+              sig: {
+                v,
+                r,
+                s,
+                deadline: MAX_UINT256,
+              },
+            },
+          })
+        ).to.eq(1);
+
+        expect(
+          await postReturningTokenId({
+            vars: {
+              profileId: FIRST_PROFILE_ID,
+              contentURI: MOCK_URI,
+              collectModule: freeCollectModule.address,
+              collectModuleInitData: abiCoder.encode(['bool'], [true]),
+              referenceModule: ZERO_ADDRESS,
+              referenceModuleInitData: [],
+            },
+          })
+        ).to.eq(2);
+      });
+
       it('User should create a post with empty collect and reference module data, fetched post data should be accurate', async function () {
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-            collectModule: emptyCollectModule.address,
-            collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
 
@@ -185,11 +246,7 @@ makeSuiteCleanRoom('Publishing Posts', function () {
         expect(pub.profileIdPointed).to.eq(0);
         expect(pub.pubIdPointed).to.eq(0);
         expect(pub.contentURI).to.eq(MOCK_URI);
-<<<<<<< HEAD
         expect(pub.collectModule).to.eq(freeCollectModule.address);
-=======
-        expect(pub.collectModule).to.eq(emptyCollectModule.address);
->>>>>>> dd137b2 (Initial commit)
         expect(pub.collectNFT).to.eq(ZERO_ADDRESS);
         expect(pub.referenceModule).to.eq(ZERO_ADDRESS);
       });
@@ -199,26 +256,17 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           lensHub.connect(governance).whitelistReferenceModule(mockReferenceModule.address, true)
         ).to.not.be.reverted;
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         await expect(
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-            collectModule: emptyCollectModule.address,
-            collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: mockReferenceModule.address,
-            referenceModuleData: mockModuleData,
+            referenceModuleInitData: mockModuleData,
           })
         ).to.not.be.reverted;
       });
@@ -233,7 +281,7 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -242,24 +290,20 @@ makeSuiteCleanRoom('Publishing Posts', function () {
     context('Negatives', function () {
       it('Testwallet should fail to post with sig with signature deadline mismatch', async function () {
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
+        const collectModuleInitData = [];
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
         const { v, r, s } = await getPostWithSigParts(
           FIRST_PROFILE_ID,
           MOCK_URI,
           ZERO_ADDRESS,
-          collectModuleData,
+          collectModuleInitData,
           ZERO_ADDRESS,
-          referenceModuleData,
+          referenceModuleInitData,
           nonce,
           '0'
         );
@@ -269,9 +313,9 @@ makeSuiteCleanRoom('Publishing Posts', function () {
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: ZERO_ADDRESS,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -284,24 +328,20 @@ makeSuiteCleanRoom('Publishing Posts', function () {
 
       it('Testwallet should fail to post with sig with invalid deadline', async function () {
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
+        const collectModuleInitData = [];
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
         const { v, r, s } = await getPostWithSigParts(
           FIRST_PROFILE_ID,
           MOCK_URI,
           ZERO_ADDRESS,
-          collectModuleData,
+          collectModuleInitData,
           ZERO_ADDRESS,
-          referenceModuleData,
+          referenceModuleInitData,
           nonce,
           '0'
         );
@@ -311,9 +351,9 @@ makeSuiteCleanRoom('Publishing Posts', function () {
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: ZERO_ADDRESS,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -326,24 +366,20 @@ makeSuiteCleanRoom('Publishing Posts', function () {
 
       it('Testwallet should fail to post with sig with invalid nonce', async function () {
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
+        const collectModuleInitData = [];
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
         const { v, r, s } = await getPostWithSigParts(
           FIRST_PROFILE_ID,
           MOCK_URI,
           ZERO_ADDRESS,
-          collectModuleData,
+          collectModuleInitData,
           ZERO_ADDRESS,
-          referenceModuleData,
+          referenceModuleInitData,
           nonce + 1,
           MAX_UINT256
         );
@@ -352,14 +388,10 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           lensHub.postWithSig({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: ZERO_ADDRESS,
-=======
-            collectModule: userAddress,
->>>>>>> dd137b2 (Initial commit)
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -372,16 +404,16 @@ makeSuiteCleanRoom('Publishing Posts', function () {
 
       it('Testwallet should fail to post with sig with an unwhitelisted collect module', async function () {
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
+        const collectModuleInitData = [];
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
         const { v, r, s } = await getPostWithSigParts(
           FIRST_PROFILE_ID,
           MOCK_URI,
           userAddress,
-          collectModuleData,
+          collectModuleInitData,
           ZERO_ADDRESS,
-          referenceModuleData,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -391,9 +423,9 @@ makeSuiteCleanRoom('Publishing Posts', function () {
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
             collectModule: userAddress,
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -406,32 +438,20 @@ makeSuiteCleanRoom('Publishing Posts', function () {
 
       it('Testwallet should fail to post with sig with an unwhitelisted reference module', async function () {
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = abiCoder.encode(['bool'], [true]);
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
-        ).to.not.be.reverted;
-
-        const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
->>>>>>> dd137b2 (Initial commit)
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
         const { v, r, s } = await getPostWithSigParts(
           FIRST_PROFILE_ID,
           MOCK_URI,
-<<<<<<< HEAD
           freeCollectModule.address,
-=======
-          emptyCollectModule.address,
->>>>>>> dd137b2 (Initial commit)
-          collectModuleData,
+          collectModuleInitData,
           userAddress,
-          referenceModuleData,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -440,14 +460,10 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           lensHub.postWithSig({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-=======
-            collectModule: emptyCollectModule.address,
->>>>>>> dd137b2 (Initial commit)
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: userAddress,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -460,32 +476,20 @@ makeSuiteCleanRoom('Publishing Posts', function () {
 
       it('TestWallet should sign attempt to post with sig, cancel via empty permitForAll, then fail to post with sig', async function () {
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = abiCoder.encode(['bool'], [true]);
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
-        ).to.not.be.reverted;
-
-        const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
->>>>>>> dd137b2 (Initial commit)
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
         const { v, r, s } = await getPostWithSigParts(
           FIRST_PROFILE_ID,
           MOCK_URI,
-<<<<<<< HEAD
           freeCollectModule.address,
-=======
-          emptyCollectModule.address,
->>>>>>> dd137b2 (Initial commit)
-          collectModuleData,
+          collectModuleInitData,
           ZERO_ADDRESS,
-          referenceModuleData,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -496,14 +500,10 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           lensHub.postWithSig({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-=======
-            collectModule: emptyCollectModule.address,
->>>>>>> dd137b2 (Initial commit)
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -518,32 +518,20 @@ makeSuiteCleanRoom('Publishing Posts', function () {
     context('Scenarios', function () {
       it('TestWallet should post with sig, fetched post data should be accurate', async function () {
         await expect(
-<<<<<<< HEAD
           lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
         ).to.not.be.reverted;
 
         const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = abiCoder.encode(['bool'], [true]);
-=======
-          lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
-        ).to.not.be.reverted;
-
-        const nonce = (await lensHub.sigNonces(testWallet.address)).toNumber();
-        const collectModuleData = [];
->>>>>>> dd137b2 (Initial commit)
+        const collectModuleInitData = abiCoder.encode(['bool'], [true]);
+        const referenceModuleInitData = [];
         const referenceModuleData = [];
-
         const { v, r, s } = await getPostWithSigParts(
           FIRST_PROFILE_ID,
           MOCK_URI,
-<<<<<<< HEAD
           freeCollectModule.address,
-=======
-          emptyCollectModule.address,
->>>>>>> dd137b2 (Initial commit)
-          collectModuleData,
+          collectModuleInitData,
           ZERO_ADDRESS,
-          referenceModuleData,
+          referenceModuleInitData,
           nonce,
           MAX_UINT256
         );
@@ -552,14 +540,10 @@ makeSuiteCleanRoom('Publishing Posts', function () {
           lensHub.postWithSig({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-=======
-            collectModule: emptyCollectModule.address,
->>>>>>> dd137b2 (Initial commit)
-            collectModuleData: collectModuleData,
+            collectModuleInitData: collectModuleInitData,
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: referenceModuleData,
+            referenceModuleInitData: referenceModuleInitData,
             sig: {
               v,
               r,
@@ -573,11 +557,7 @@ makeSuiteCleanRoom('Publishing Posts', function () {
         expect(pub.profileIdPointed).to.eq(0);
         expect(pub.pubIdPointed).to.eq(0);
         expect(pub.contentURI).to.eq(MOCK_URI);
-<<<<<<< HEAD
         expect(pub.collectModule).to.eq(freeCollectModule.address);
-=======
-        expect(pub.collectModule).to.eq(emptyCollectModule.address);
->>>>>>> dd137b2 (Initial commit)
         expect(pub.collectNFT).to.eq(ZERO_ADDRESS);
         expect(pub.referenceModule).to.eq(ZERO_ADDRESS);
       });

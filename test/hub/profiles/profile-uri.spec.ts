@@ -1,33 +1,22 @@
 import '@nomiclabs/hardhat-ethers';
 import { expect } from 'chai';
-<<<<<<< HEAD
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
-=======
->>>>>>> dd137b2 (Initial commit)
 import { FollowNFT__factory } from '../../../typechain-types';
 import { MAX_UINT256, ZERO_ADDRESS } from '../../helpers/constants';
 import { ERRORS } from '../../helpers/errors';
 import {
   cancelWithPermitForAll,
-<<<<<<< HEAD
   getDecodedSvgImage,
   getMetadataFromBase64TokenUri,
   getSetFollowNFTURIWithSigParts,
   getSetProfileImageURIWithSigParts,
   loadTestResourceAsUtf8String,
-=======
-  getSetFollowNFTURIWithSigParts,
-  getSetProfileImageURIWithSigParts,
->>>>>>> dd137b2 (Initial commit)
 } from '../../helpers/utils';
 import {
   FIRST_PROFILE_ID,
   lensHub,
   makeSuiteCleanRoom,
-<<<<<<< HEAD
   MAX_PROFILE_IMAGE_URI_LENGTH,
-=======
->>>>>>> dd137b2 (Initial commit)
   MOCK_FOLLOW_NFT_URI,
   MOCK_PROFILE_HANDLE,
   MOCK_PROFILE_URI,
@@ -49,7 +38,7 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -62,7 +51,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
         ).to.be.revertedWith(ERRORS.NOT_PROFILE_OWNER_OR_DISPATCHER);
       });
 
-<<<<<<< HEAD
       it('UserTwo should fail to set the profile URI on profile owned by user 1', async function () {
         const profileURITooLong = MOCK_URI.repeat(500);
         expect(profileURITooLong.length).to.be.greaterThan(MAX_PROFILE_IMAGE_URI_LENGTH);
@@ -71,8 +59,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
         ).to.be.revertedWith(ERRORS.INVALID_IMAGE_URI_LENGTH);
       });
 
-=======
->>>>>>> dd137b2 (Initial commit)
       it('UserTwo should fail to change the follow NFT URI for profile one', async function () {
         await expect(
           lensHub.connect(userTwo).setFollowNFTURI(FIRST_PROFILE_ID, OTHER_MOCK_URI)
@@ -81,7 +67,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
     });
 
     context('Scenarios', function () {
-<<<<<<< HEAD
       it('User should have a custom picture tokenURI after setting the profile imageURI', async function () {
         await expect(lensHub.setProfileImageURI(FIRST_PROFILE_ID, MOCK_URI)).to.not.be.reverted;
         const tokenUri = await lensHub.tokenURI(FIRST_PROFILE_ID);
@@ -208,11 +193,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
         expect(metadataAfterFollow.attributes).to.eql(expectedAttributesAfterFollow);
         const svgAfterFollow = await getDecodedSvgImage(metadataAfterFollow);
         expect(svgAfterFollow).to.eq(expectedSvg);
-=======
-      it('User should set the profile URI', async function () {
-        await expect(lensHub.setProfileImageURI(FIRST_PROFILE_ID, MOCK_URI)).to.not.be.reverted;
-        expect(await lensHub.tokenURI(FIRST_PROFILE_ID)).to.eq(MOCK_URI);
->>>>>>> dd137b2 (Initial commit)
       });
 
       it('User should set user two as a dispatcher on their profile, user two should set the profile URI', async function () {
@@ -220,7 +200,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
         await expect(
           lensHub.connect(userTwo).setProfileImageURI(FIRST_PROFILE_ID, MOCK_URI)
         ).to.not.be.reverted;
-<<<<<<< HEAD
         const tokenUri = await lensHub.tokenURI(FIRST_PROFILE_ID);
         const metadata = await getMetadataFromBase64TokenUri(tokenUri);
         expect(metadata.name).to.eq(`@${MOCK_PROFILE_HANDLE}`);
@@ -235,9 +214,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
         const actualSvg = await getDecodedSvgImage(metadata);
         const expectedSvg = loadTestResourceAsUtf8String('profile-token-uri-images/mock.svg');
         expect(actualSvg).to.eq(expectedSvg);
-=======
-        expect(await lensHub.tokenURI(FIRST_PROFILE_ID)).to.eq(MOCK_URI);
->>>>>>> dd137b2 (Initial commit)
       });
 
       it('User should follow profile 1, user should change the follow NFT URI, URI is accurate before and after the change', async function () {
@@ -264,7 +240,7 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -470,7 +446,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
           MAX_UINT256
         );
 
-<<<<<<< HEAD
         const tokenUriBefore = await lensHub.tokenURI(FIRST_PROFILE_ID);
         const metadataBefore = await getMetadataFromBase64TokenUri(tokenUriBefore);
         expect(metadataBefore.name).to.eq(`@${MOCK_PROFILE_HANDLE}`);
@@ -488,8 +463,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
         );
         expect(svgBefore).to.eq(expectedSvgBefore);
 
-=======
->>>>>>> dd137b2 (Initial commit)
         await expect(
           lensHub.setProfileImageURIWithSig({
             profileId: FIRST_PROFILE_ID,
@@ -503,7 +476,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
           })
         ).to.not.be.reverted;
 
-<<<<<<< HEAD
         const tokenUriAfter = await lensHub.tokenURI(FIRST_PROFILE_ID);
 
         expect(MOCK_PROFILE_URI).to.not.eq(MOCK_URI);
@@ -522,9 +494,6 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
         const svgAfter = await getDecodedSvgImage(metadataAfter);
         const expectedSvgAfter = loadTestResourceAsUtf8String('profile-token-uri-images/mock.svg');
         expect(svgAfter).to.eq(expectedSvgAfter);
-=======
-        expect(await lensHub.tokenURI(FIRST_PROFILE_ID)).to.eq(MOCK_URI);
->>>>>>> dd137b2 (Initial commit)
       });
 
       it('TestWallet should set the follow NFT URI with sig', async function () {
@@ -536,11 +505,8 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
           MAX_UINT256
         );
 
-<<<<<<< HEAD
         const followNFTURIBefore = await lensHub.getFollowNFTURI(FIRST_PROFILE_ID);
 
-=======
->>>>>>> dd137b2 (Initial commit)
         await expect(
           lensHub.setFollowNFTURIWithSig({
             profileId: FIRST_PROFILE_ID,
@@ -553,14 +519,11 @@ makeSuiteCleanRoom('Profile URI Functionality', function () {
             },
           })
         ).to.not.be.reverted;
-<<<<<<< HEAD
 
         const followNFTURIAfter = await lensHub.getFollowNFTURI(FIRST_PROFILE_ID);
 
         expect(followNFTURIBefore).to.eq(MOCK_FOLLOW_NFT_URI);
         expect(followNFTURIAfter).to.eq(MOCK_URI);
-=======
->>>>>>> dd137b2 (Initial commit)
       });
     });
   });

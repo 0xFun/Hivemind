@@ -1,26 +1,23 @@
 import '@nomiclabs/hardhat-ethers';
 import { expect } from 'chai';
-<<<<<<< HEAD
 import { keccak256, toUtf8Bytes } from 'ethers/lib/utils';
-import { UIDataProvider__factory } from '../../typechain-types';
-import { ZERO_ADDRESS } from '../helpers/constants';
+import { FollowNFT__factory, UIDataProvider__factory } from '../../typechain-types';
+import { MAX_UINT256, ZERO_ADDRESS } from '../helpers/constants';
 import { ERRORS } from '../helpers/errors';
 import {
   getDecodedSvgImage,
   getMetadataFromBase64TokenUri,
+  getSetProfileMetadataURIWithSigParts,
+  getTimestamp,
+  getToggleFollowWithSigParts,
   loadTestResourceAsUtf8String,
+  matchEvent,
+  waitForTx,
 } from '../helpers/utils';
 import {
   approvalFollowModule,
   deployer,
   freeCollectModule,
-=======
-import { ZERO_ADDRESS } from '../helpers/constants';
-import { ERRORS } from '../helpers/errors';
-import {
-  approvalFollowModule,
-  emptyCollectModule,
->>>>>>> dd137b2 (Initial commit)
   FIRST_PROFILE_ID,
   followerOnlyReferenceModule,
   governance,
@@ -42,10 +39,12 @@ import {
   userAddress,
   userTwo,
   userTwoAddress,
-<<<<<<< HEAD
   abiCoder,
-=======
->>>>>>> dd137b2 (Initial commit)
+  userThree,
+  testWallet,
+  lensPeriphery,
+  followNFTImpl,
+  collectNFTImpl,
 } from '../__setup.spec';
 
 /**
@@ -75,7 +74,7 @@ makeSuiteCleanRoom('Misc', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -151,11 +150,7 @@ makeSuiteCleanRoom('Misc', function () {
       expect(await lensHub.getPubCount(FIRST_PROFILE_ID)).to.eq(0);
 
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       const expectedCount = 5;
@@ -164,23 +159,25 @@ makeSuiteCleanRoom('Misc', function () {
           lensHub.post({
             profileId: FIRST_PROFILE_ID,
             contentURI: MOCK_URI,
-<<<<<<< HEAD
             collectModule: freeCollectModule.address,
-            collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-            collectModule: emptyCollectModule.address,
-            collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+            collectModuleInitData: abiCoder.encode(['bool'], [true]),
             referenceModule: ZERO_ADDRESS,
-            referenceModuleData: [],
+            referenceModuleInitData: [],
           })
         ).to.not.be.reverted;
       }
       expect(await lensHub.getPubCount(FIRST_PROFILE_ID)).to.eq(expectedCount);
     });
 
+    it('Follow NFT impl getter should return the correct address', async function () {
+      expect(await lensHub.getFollowNFTImpl()).to.eq(followNFTImpl.address);
+    });
+
+    it('Collect NFT impl getter should return the correct address', async function () {
+      expect(await lensHub.getCollectNFTImpl()).to.eq(collectNFTImpl.address);
+    });
+
     it('Profile tokenURI should return the accurate URI', async function () {
-<<<<<<< HEAD
       const tokenUri = await lensHub.tokenURI(FIRST_PROFILE_ID);
       const metadata = await getMetadataFromBase64TokenUri(tokenUri);
       expect(metadata.name).to.eq(`@${MOCK_PROFILE_HANDLE}`);
@@ -195,18 +192,11 @@ makeSuiteCleanRoom('Misc', function () {
       const actualSvg = await getDecodedSvgImage(metadata);
       const expectedSvg = loadTestResourceAsUtf8String('profile-token-uri-images/mock-profile.svg');
       expect(actualSvg).to.eq(expectedSvg);
-=======
-      expect(await lensHub.tokenURI(FIRST_PROFILE_ID)).to.eq(MOCK_PROFILE_URI);
->>>>>>> dd137b2 (Initial commit)
     });
 
     it('Publication reference module getter should return the correct reference module (or zero in case of no reference module)', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
@@ -219,15 +209,10 @@ makeSuiteCleanRoom('Misc', function () {
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
       expect(await lensHub.getReferenceModule(FIRST_PROFILE_ID, 1)).to.eq(ZERO_ADDRESS);
@@ -236,15 +221,10 @@ makeSuiteCleanRoom('Misc', function () {
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: followerOnlyReferenceModule.address,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
       expect(await lensHub.getReferenceModule(FIRST_PROFILE_ID, 2)).to.eq(
@@ -254,26 +234,17 @@ makeSuiteCleanRoom('Misc', function () {
 
     it('Publication pointer getter should return an empty pointer for posts', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -284,26 +255,17 @@ makeSuiteCleanRoom('Misc', function () {
 
     it('Publication pointer getter should return the correct pointer for comments', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -313,15 +275,11 @@ makeSuiteCleanRoom('Misc', function () {
           contentURI: MOCK_URI,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-<<<<<<< HEAD
-          collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          collectModule: freeCollectModule.address,
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -332,26 +290,17 @@ makeSuiteCleanRoom('Misc', function () {
 
     it('Publication pointer getter should return the correct pointer for mirrors', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -360,8 +309,9 @@ makeSuiteCleanRoom('Misc', function () {
           profileId: FIRST_PROFILE_ID,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -372,26 +322,17 @@ makeSuiteCleanRoom('Misc', function () {
 
     it('Publication content URI getter should return the correct URI for posts', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -400,26 +341,17 @@ makeSuiteCleanRoom('Misc', function () {
 
     it('Publication content URI getter should return the correct URI for comments', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -429,15 +361,11 @@ makeSuiteCleanRoom('Misc', function () {
           contentURI: OTHER_MOCK_URI,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-<<<<<<< HEAD
-          collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          collectModule: freeCollectModule.address,
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -446,26 +374,17 @@ makeSuiteCleanRoom('Misc', function () {
 
     it('Publication content URI getter should return the correct URI for mirrors', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -474,8 +393,9 @@ makeSuiteCleanRoom('Misc', function () {
           profileId: FIRST_PROFILE_ID,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
       expect(await lensHub.getContentURI(FIRST_PROFILE_ID, 2)).to.eq(MOCK_URI);
@@ -483,58 +403,36 @@ makeSuiteCleanRoom('Misc', function () {
 
     it('Publication collect module getter should return the correct collectModule for posts', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
-<<<<<<< HEAD
       expect(await lensHub.getCollectModule(FIRST_PROFILE_ID, 1)).to.eq(freeCollectModule.address);
-=======
-      expect(await lensHub.getCollectModule(FIRST_PROFILE_ID, 1)).to.eq(emptyCollectModule.address);
->>>>>>> dd137b2 (Initial commit)
     });
 
     it('Publication collect module getter should return the correct collectModule for comments', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -543,8 +441,9 @@ makeSuiteCleanRoom('Misc', function () {
           profileId: FIRST_PROFILE_ID,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -554,47 +453,30 @@ makeSuiteCleanRoom('Misc', function () {
           contentURI: OTHER_MOCK_URI,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 2,
-<<<<<<< HEAD
-          collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          collectModule: freeCollectModule.address,
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
-<<<<<<< HEAD
       expect(await lensHub.getCollectModule(FIRST_PROFILE_ID, 3)).to.eq(freeCollectModule.address);
-=======
-      expect(await lensHub.getCollectModule(FIRST_PROFILE_ID, 3)).to.eq(emptyCollectModule.address);
->>>>>>> dd137b2 (Initial commit)
     });
 
     it('Publication collect module getter should return the zero address for mirrors', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -603,8 +485,9 @@ makeSuiteCleanRoom('Misc', function () {
           profileId: FIRST_PROFILE_ID,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -613,26 +496,17 @@ makeSuiteCleanRoom('Misc', function () {
 
     it('Publication type getter should return the correct publication type for all publication types, or nonexistent', async function () {
       await expect(
-<<<<<<< HEAD
         lensHub.connect(governance).whitelistCollectModule(freeCollectModule.address, true)
-=======
-        lensHub.connect(governance).whitelistCollectModule(emptyCollectModule.address, true)
->>>>>>> dd137b2 (Initial commit)
       ).to.not.be.reverted;
 
       await expect(
         lensHub.post({
           profileId: FIRST_PROFILE_ID,
           contentURI: MOCK_URI,
-<<<<<<< HEAD
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -642,15 +516,11 @@ makeSuiteCleanRoom('Misc', function () {
           contentURI: OTHER_MOCK_URI,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-<<<<<<< HEAD
-          collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
-=======
-          collectModule: emptyCollectModule.address,
-          collectModuleData: [],
->>>>>>> dd137b2 (Initial commit)
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          collectModule: freeCollectModule.address,
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -659,8 +529,9 @@ makeSuiteCleanRoom('Misc', function () {
           profileId: FIRST_PROFILE_ID,
           profileIdPointed: FIRST_PROFILE_ID,
           pubIdPointed: 1,
-          referenceModule: ZERO_ADDRESS,
           referenceModuleData: [],
+          referenceModule: ZERO_ADDRESS,
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -691,7 +562,7 @@ makeSuiteCleanRoom('Misc', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: approvalFollowModule.address,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -703,7 +574,6 @@ makeSuiteCleanRoom('Misc', function () {
       );
     });
 
-<<<<<<< HEAD
     it('Follow module following check when there are no follows, and thus no deployed Follow NFT should return false', async function () {
       expect(
         await approvalFollowModule.isFollowing(FIRST_PROFILE_ID, userTwoAddress, 0)
@@ -711,86 +581,45 @@ makeSuiteCleanRoom('Misc', function () {
     });
 
     it('Follow module following check with zero ID input should return false after another address follows, but not the queried address', async function () {
-=======
-    it('Follow module follow validation when there are no follows, and thus no deployed Follow NFT should revert', async function () {
-      await expect(
-        approvalFollowModule.validateFollow(FIRST_PROFILE_ID, userTwoAddress, 0)
-      ).to.be.revertedWith(ERRORS.FOLLOW_INVALID);
-    });
-
-    it('Follow module follow validation with zero ID input should revert after another address follows, but not the queried address', async function () {
->>>>>>> dd137b2 (Initial commit)
       await expect(
         approvalFollowModule.connect(user).approve(FIRST_PROFILE_ID, [userAddress], [true])
       ).to.not.be.reverted;
       await expect(lensHub.follow([FIRST_PROFILE_ID], [[]])).to.not.be.reverted;
 
-<<<<<<< HEAD
       expect(
         await approvalFollowModule.isFollowing(FIRST_PROFILE_ID, userTwoAddress, 0)
       ).to.be.false;
     });
 
     it('Follow module following check with specific ID input should revert after following, but the specific ID does not exist yet', async function () {
-=======
-      await expect(
-        approvalFollowModule.validateFollow(FIRST_PROFILE_ID, userTwoAddress, 0)
-      ).to.be.revertedWith(ERRORS.FOLLOW_INVALID);
-    });
-
-    it('Follow module follow validation with specific ID input should revert after following, but the specific ID does not exist yet', async function () {
->>>>>>> dd137b2 (Initial commit)
       await expect(
         approvalFollowModule.connect(user).approve(FIRST_PROFILE_ID, [userAddress], [true])
       ).to.not.be.reverted;
       await expect(lensHub.follow([FIRST_PROFILE_ID], [[]])).to.not.be.reverted;
 
       await expect(
-<<<<<<< HEAD
         approvalFollowModule.isFollowing(FIRST_PROFILE_ID, userAddress, 2)
       ).to.be.revertedWith(ERRORS.ERC721_QUERY_FOR_NONEXISTENT_TOKEN);
     });
 
     it('Follow module following check with specific ID input should return false if another address owns the specified follow NFT', async function () {
-=======
-        approvalFollowModule.validateFollow(FIRST_PROFILE_ID, userAddress, 2)
-      ).to.be.revertedWith(ERRORS.ERC721_QUERY_FOR_NONEXISTENT_TOKEN);
-    });
-
-    it('Follow module follow validation with specific ID input should revert if another address owns the specified follow NFT', async function () {
->>>>>>> dd137b2 (Initial commit)
       await expect(
         approvalFollowModule.connect(user).approve(FIRST_PROFILE_ID, [userAddress], [true])
       ).to.not.be.reverted;
       await expect(lensHub.follow([FIRST_PROFILE_ID], [[]])).to.not.be.reverted;
 
-<<<<<<< HEAD
       expect(
         await approvalFollowModule.isFollowing(FIRST_PROFILE_ID, userTwoAddress, 1)
       ).to.be.false;
     });
 
     it('Follow module following check with specific ID input should return true if the queried address owns the specified follow NFT', async function () {
-=======
-      await expect(
-        approvalFollowModule.validateFollow(FIRST_PROFILE_ID, userTwoAddress, 1)
-      ).to.be.revertedWith(ERRORS.FOLLOW_INVALID);
-    });
-
-    it('Follow module follow validation with specific ID input should work if the queried address owns the specified follow NFT', async function () {
->>>>>>> dd137b2 (Initial commit)
       await expect(
         approvalFollowModule.connect(user).approve(FIRST_PROFILE_ID, [userAddress], [true])
       ).to.not.be.reverted;
       await expect(lensHub.follow([FIRST_PROFILE_ID], [[]])).to.not.be.reverted;
 
-<<<<<<< HEAD
       expect(await approvalFollowModule.isFollowing(FIRST_PROFILE_ID, userAddress, 1)).to.be.true;
-=======
-      await expect(
-        approvalFollowModule.validateFollow(FIRST_PROFILE_ID, userAddress, 1)
-      ).to.not.be.reverted;
->>>>>>> dd137b2 (Initial commit)
     });
   });
 
@@ -857,7 +686,6 @@ makeSuiteCleanRoom('Misc', function () {
       });
     });
   });
-<<<<<<< HEAD
 
   context('UI Data Provider', function () {
     it('UI Data Provider should return expected values', async function () {
@@ -868,7 +696,7 @@ makeSuiteCleanRoom('Misc', function () {
           handle: MOCK_PROFILE_HANDLE,
           imageURI: MOCK_PROFILE_URI,
           followModule: ZERO_ADDRESS,
-          followModuleData: [],
+          followModuleInitData: [],
           followNFTURI: MOCK_FOLLOW_NFT_URI,
         })
       ).to.not.be.reverted;
@@ -886,9 +714,9 @@ makeSuiteCleanRoom('Misc', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: firstURI,
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -897,9 +725,9 @@ makeSuiteCleanRoom('Misc', function () {
           profileId: FIRST_PROFILE_ID,
           contentURI: secondURI,
           collectModule: freeCollectModule.address,
-          collectModuleData: abiCoder.encode(['bool'], [true]),
+          collectModuleInitData: abiCoder.encode(['bool'], [true]),
           referenceModule: ZERO_ADDRESS,
-          referenceModuleData: [],
+          referenceModuleInitData: [],
         })
       ).to.not.be.reverted;
 
@@ -945,6 +773,483 @@ makeSuiteCleanRoom('Misc', function () {
       expect(pubByHandleStruct.collectNFT).to.eq(ZERO_ADDRESS);
     });
   });
-=======
->>>>>>> dd137b2 (Initial commit)
+
+  context('LensPeriphery', async function () {
+    context('ToggleFollowing', function () {
+      beforeEach(async function () {
+        await expect(
+          lensHub.createProfile({
+            to: userAddress,
+            handle: MOCK_PROFILE_HANDLE,
+            imageURI: MOCK_PROFILE_URI,
+            followModule: ZERO_ADDRESS,
+            followModuleInitData: [],
+            followNFTURI: MOCK_FOLLOW_NFT_URI,
+          })
+        ).to.not.be.reverted;
+        await expect(lensHub.connect(userTwo).follow([FIRST_PROFILE_ID], [[]])).to.not.be.reverted;
+        await expect(
+          lensHub.connect(userThree).follow([FIRST_PROFILE_ID], [[]])
+        ).to.not.be.reverted;
+        await expect(
+          lensHub.connect(testWallet).follow([FIRST_PROFILE_ID], [[]])
+        ).to.not.be.reverted;
+      });
+
+      context('Generic', function () {
+        context('Negatives', function () {
+          it('UserTwo should fail to toggle follow with an incorrect profileId', async function () {
+            await expect(
+              lensPeriphery.connect(userTwo).toggleFollow([FIRST_PROFILE_ID + 1], [true])
+            ).to.be.revertedWith(ERRORS.FOLLOW_INVALID);
+          });
+
+          it('UserTwo should fail to toggle follow with array mismatch', async function () {
+            await expect(
+              lensPeriphery.connect(userTwo).toggleFollow([FIRST_PROFILE_ID, FIRST_PROFILE_ID], [])
+            ).to.be.revertedWith(ERRORS.ARRAY_MISMATCH);
+          });
+
+          it('UserTwo should fail to toggle follow from a profile that has been burned', async function () {
+            await expect(lensHub.burn(FIRST_PROFILE_ID)).to.not.be.reverted;
+            await expect(
+              lensPeriphery.connect(userTwo).toggleFollow([FIRST_PROFILE_ID], [true])
+            ).to.be.revertedWith(ERRORS.TOKEN_DOES_NOT_EXIST);
+          });
+
+          it('UserTwo should fail to toggle follow for a followNFT that is not owned by them', async function () {
+            const followNFTAddress = await lensHub.getFollowNFT(FIRST_PROFILE_ID);
+            const followNFT = FollowNFT__factory.connect(followNFTAddress, user);
+
+            await expect(
+              followNFT.connect(userTwo).transferFrom(userTwoAddress, userAddress, 1)
+            ).to.not.be.reverted;
+
+            await expect(
+              lensPeriphery.connect(userTwo).toggleFollow([FIRST_PROFILE_ID], [true])
+            ).to.be.revertedWith(ERRORS.FOLLOW_INVALID);
+          });
+        });
+
+        context('Scenarios', function () {
+          it('UserTwo should toggle follow with true value, correct event should be emitted', async function () {
+            const tx = lensPeriphery.connect(userTwo).toggleFollow([FIRST_PROFILE_ID], [true]);
+
+            const receipt = await waitForTx(tx);
+
+            expect(receipt.logs.length).to.eq(1);
+            matchEvent(receipt, 'FollowsToggled', [
+              userTwoAddress,
+              [FIRST_PROFILE_ID],
+              [true],
+              await getTimestamp(),
+            ]);
+          });
+
+          it('User should create another profile, userTwo follows, then toggles both, one true, one false, correct event should be emitted', async function () {
+            await expect(
+              lensHub.createProfile({
+                to: userAddress,
+                handle: 'otherhandle',
+                imageURI: OTHER_MOCK_URI,
+                followModule: ZERO_ADDRESS,
+                followModuleInitData: [],
+                followNFTURI: MOCK_FOLLOW_NFT_URI,
+              })
+            ).to.not.be.reverted;
+            await expect(
+              lensHub.connect(userTwo).follow([FIRST_PROFILE_ID + 1], [[]])
+            ).to.not.be.reverted;
+
+            const tx = lensPeriphery
+              .connect(userTwo)
+              .toggleFollow([FIRST_PROFILE_ID, FIRST_PROFILE_ID + 1], [true, false]);
+
+            const receipt = await waitForTx(tx);
+
+            expect(receipt.logs.length).to.eq(1);
+            matchEvent(receipt, 'FollowsToggled', [
+              userTwoAddress,
+              [FIRST_PROFILE_ID, FIRST_PROFILE_ID + 1],
+              [true, false],
+              await getTimestamp(),
+            ]);
+          });
+
+          it('UserTwo should toggle follow with false value, correct event should be emitted', async function () {
+            const tx = lensPeriphery.connect(userTwo).toggleFollow([FIRST_PROFILE_ID], [false]);
+
+            const receipt = await waitForTx(tx);
+
+            expect(receipt.logs.length).to.eq(1);
+            matchEvent(receipt, 'FollowsToggled', [
+              userTwoAddress,
+              [FIRST_PROFILE_ID],
+              [false],
+              await getTimestamp(),
+            ]);
+          });
+        });
+      });
+
+      context('Meta-tx', function () {
+        context('Negatives', function () {
+          it('TestWallet should fail to toggle follow with sig with signature deadline mismatch', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+
+            const { v, r, s } = await getToggleFollowWithSigParts(
+              [FIRST_PROFILE_ID],
+              [true],
+              nonce,
+              '0'
+            );
+            await expect(
+              lensPeriphery.toggleFollowWithSig({
+                follower: testWallet.address,
+                profileIds: [FIRST_PROFILE_ID],
+                enables: [true],
+                sig: {
+                  v,
+                  r,
+                  s,
+                  deadline: MAX_UINT256,
+                },
+              })
+            ).to.be.revertedWith(ERRORS.SIGNATURE_INVALID);
+          });
+
+          it('TestWallet should fail to toggle follow with sig with invalid deadline', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+
+            const { v, r, s } = await getToggleFollowWithSigParts(
+              [FIRST_PROFILE_ID],
+              [true],
+              nonce,
+              '0'
+            );
+            await expect(
+              lensPeriphery.toggleFollowWithSig({
+                follower: testWallet.address,
+                profileIds: [FIRST_PROFILE_ID],
+                enables: [true],
+                sig: {
+                  v,
+                  r,
+                  s,
+                  deadline: '0',
+                },
+              })
+            ).to.be.revertedWith(ERRORS.SIGNATURE_EXPIRED);
+          });
+
+          it('TestWallet should fail to toggle follow with sig with invalid nonce', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+
+            const { v, r, s } = await getToggleFollowWithSigParts(
+              [FIRST_PROFILE_ID],
+              [true],
+              nonce + 1,
+              MAX_UINT256
+            );
+
+            await expect(
+              lensPeriphery.toggleFollowWithSig({
+                follower: testWallet.address,
+                profileIds: [FIRST_PROFILE_ID],
+                enables: [true],
+                sig: {
+                  v,
+                  r,
+                  s,
+                  deadline: MAX_UINT256,
+                },
+              })
+            ).to.be.revertedWith(ERRORS.SIGNATURE_INVALID);
+          });
+
+          it('TestWallet should fail to toggle follow a nonexistent profile with sig', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+            const INVALID_PROFILE = FIRST_PROFILE_ID + 1;
+            const { v, r, s } = await getToggleFollowWithSigParts(
+              [INVALID_PROFILE],
+              [true],
+              nonce,
+              MAX_UINT256
+            );
+            await expect(
+              lensPeriphery.toggleFollowWithSig({
+                follower: testWallet.address,
+                profileIds: [INVALID_PROFILE],
+                enables: [true],
+                sig: {
+                  v,
+                  r,
+                  s,
+                  deadline: MAX_UINT256,
+                },
+              })
+            ).to.be.revertedWith(ERRORS.FOLLOW_INVALID);
+          });
+        });
+
+        context('Scenarios', function () {
+          it('TestWallet should toggle follow profile 1 to true with sig, correct event should be emitted ', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+
+            const { v, r, s } = await getToggleFollowWithSigParts(
+              [FIRST_PROFILE_ID],
+              [true],
+              nonce,
+              MAX_UINT256
+            );
+
+            const tx = lensPeriphery.toggleFollowWithSig({
+              follower: testWallet.address,
+              profileIds: [FIRST_PROFILE_ID],
+              enables: [true],
+              sig: {
+                v,
+                r,
+                s,
+                deadline: MAX_UINT256,
+              },
+            });
+
+            const receipt = await waitForTx(tx);
+
+            expect(receipt.logs.length).to.eq(1);
+            matchEvent(receipt, 'FollowsToggled', [
+              testWallet.address,
+              [FIRST_PROFILE_ID],
+              [true],
+              await getTimestamp(),
+            ]);
+          });
+
+          it('TestWallet should toggle follow profile 1 to false with sig, correct event should be emitted ', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+
+            const enabled = false;
+            const { v, r, s } = await getToggleFollowWithSigParts(
+              [FIRST_PROFILE_ID],
+              [enabled],
+              nonce,
+              MAX_UINT256
+            );
+
+            const tx = lensPeriphery.toggleFollowWithSig({
+              follower: testWallet.address,
+              profileIds: [FIRST_PROFILE_ID],
+              enables: [enabled],
+              sig: {
+                v,
+                r,
+                s,
+                deadline: MAX_UINT256,
+              },
+            });
+
+            const receipt = await waitForTx(tx);
+
+            expect(receipt.logs.length).to.eq(1);
+            matchEvent(receipt, 'FollowsToggled', [
+              testWallet.address,
+              [FIRST_PROFILE_ID],
+              [enabled],
+              await getTimestamp(),
+            ]);
+          });
+        });
+      });
+    });
+
+    context('Profile Metadata URI', function () {
+      const MOCK_DATA = 'd171c8b1d364bb34553299ab686caa41ac7a2209d4a63e25947764080c4681da';
+
+      context('Generic', function () {
+        beforeEach(async function () {
+          await expect(
+            lensHub.createProfile({
+              to: userAddress,
+              handle: MOCK_PROFILE_HANDLE,
+              imageURI: MOCK_PROFILE_URI,
+              followModule: ZERO_ADDRESS,
+              followModuleInitData: [],
+              followNFTURI: MOCK_FOLLOW_NFT_URI,
+            })
+          ).to.not.be.reverted;
+        });
+
+        context('Negatives', function () {
+          it('User two should fail to set profile metadata URI for a profile that is not theirs while they are not the dispatcher', async function () {
+            await expect(
+              lensPeriphery.connect(userTwo).setProfileMetadataURI(FIRST_PROFILE_ID, MOCK_DATA)
+            ).to.be.revertedWith(ERRORS.NOT_PROFILE_OWNER_OR_DISPATCHER);
+          });
+        });
+
+        context('Scenarios', function () {
+          it("User should set user two as dispatcher, user two should set profile metadata URI for user one's profile, fetched data should be accurate", async function () {
+            await expect(
+              lensHub.setDispatcher(FIRST_PROFILE_ID, userTwoAddress)
+            ).to.not.be.reverted;
+            await expect(
+              lensPeriphery.connect(userTwo).setProfileMetadataURI(FIRST_PROFILE_ID, MOCK_DATA)
+            ).to.not.be.reverted;
+
+            expect(await lensPeriphery.getProfileMetadataURI(FIRST_PROFILE_ID)).to.eq(MOCK_DATA);
+            expect(await lensPeriphery.getProfileMetadataURI(FIRST_PROFILE_ID)).to.eq(MOCK_DATA);
+          });
+
+          it('Setting profile metadata should emit the correct event', async function () {
+            const tx = await waitForTx(
+              lensPeriphery.setProfileMetadataURI(FIRST_PROFILE_ID, MOCK_DATA)
+            );
+
+            matchEvent(tx, 'ProfileMetadataSet', [
+              FIRST_PROFILE_ID,
+              MOCK_DATA,
+              await getTimestamp(),
+            ]);
+          });
+
+          it('Setting profile metadata via dispatcher should emit the correct event', async function () {
+            await expect(
+              lensHub.setDispatcher(FIRST_PROFILE_ID, userTwoAddress)
+            ).to.not.be.reverted;
+
+            const tx = await waitForTx(
+              lensPeriphery.connect(userTwo).setProfileMetadataURI(FIRST_PROFILE_ID, MOCK_DATA)
+            );
+
+            matchEvent(tx, 'ProfileMetadataSet', [
+              FIRST_PROFILE_ID,
+              MOCK_DATA,
+              await getTimestamp(),
+            ]);
+          });
+        });
+      });
+
+      context('Meta-tx', async function () {
+        beforeEach(async function () {
+          await expect(
+            lensHub.connect(testWallet).createProfile({
+              to: testWallet.address,
+              handle: MOCK_PROFILE_HANDLE,
+              imageURI: MOCK_PROFILE_URI,
+              followModule: ZERO_ADDRESS,
+              followModuleInitData: [],
+              followNFTURI: MOCK_FOLLOW_NFT_URI,
+            })
+          ).to.not.be.reverted;
+        });
+
+        context('Negatives', async function () {
+          it('TestWallet should fail to set profile metadata URI with sig with signature deadline mismatch', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+
+            const { v, r, s } = await getSetProfileMetadataURIWithSigParts(
+              FIRST_PROFILE_ID,
+              MOCK_DATA,
+              nonce,
+              '0'
+            );
+            await expect(
+              lensPeriphery.setProfileMetadataURIWithSig({
+                profileId: FIRST_PROFILE_ID,
+                metadata: MOCK_DATA,
+                sig: {
+                  v,
+                  r,
+                  s,
+                  deadline: MAX_UINT256,
+                },
+              })
+            ).to.be.revertedWith(ERRORS.SIGNATURE_INVALID);
+          });
+
+          it('TestWallet should fail to set profile metadata URI with sig with invalid deadline', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+
+            const { v, r, s } = await getSetProfileMetadataURIWithSigParts(
+              FIRST_PROFILE_ID,
+              MOCK_DATA,
+              nonce,
+              '0'
+            );
+            await expect(
+              lensPeriphery.setProfileMetadataURIWithSig({
+                profileId: FIRST_PROFILE_ID,
+                metadata: MOCK_DATA,
+                sig: {
+                  v,
+                  r,
+                  s,
+                  deadline: '0',
+                },
+              })
+            ).to.be.revertedWith(ERRORS.SIGNATURE_EXPIRED);
+          });
+
+          it('TestWallet should fail to set profile metadata URI with sig with invalid nonce', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+
+            const { v, r, s } = await getSetProfileMetadataURIWithSigParts(
+              FIRST_PROFILE_ID,
+              MOCK_DATA,
+              nonce + 1,
+              MAX_UINT256
+            );
+            await expect(
+              lensPeriphery.setProfileMetadataURIWithSig({
+                profileId: FIRST_PROFILE_ID,
+                metadata: MOCK_DATA,
+                sig: {
+                  v,
+                  r,
+                  s,
+                  deadline: MAX_UINT256,
+                },
+              })
+            ).to.be.revertedWith(ERRORS.SIGNATURE_INVALID);
+          });
+        });
+
+        context('Scenarios', function () {
+          it('TestWallet should set profile metadata URI with sig, fetched data should be accurate and correct event should be emitted', async function () {
+            const nonce = (await lensPeriphery.sigNonces(testWallet.address)).toNumber();
+
+            const { v, r, s } = await getSetProfileMetadataURIWithSigParts(
+              FIRST_PROFILE_ID,
+              MOCK_DATA,
+              nonce,
+              MAX_UINT256
+            );
+            const tx = await waitForTx(
+              lensPeriphery.setProfileMetadataURIWithSig({
+                profileId: FIRST_PROFILE_ID,
+                metadata: MOCK_DATA,
+                sig: {
+                  v,
+                  r,
+                  s,
+                  deadline: MAX_UINT256,
+                },
+              })
+            );
+
+            expect(await lensPeriphery.getProfileMetadataURI(FIRST_PROFILE_ID)).to.eq(MOCK_DATA);
+            expect(await lensPeriphery.getProfileMetadataURI(FIRST_PROFILE_ID)).to.eq(MOCK_DATA);
+
+            matchEvent(tx, 'ProfileMetadataSet', [
+              FIRST_PROFILE_ID,
+              MOCK_DATA,
+              await getTimestamp(),
+            ]);
+          });
+        });
+      });
+    });
+  });
 });

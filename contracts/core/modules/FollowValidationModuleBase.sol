@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -11,11 +11,7 @@ import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 
 /**
  * @title FollowValidationModuleBase
-<<<<<<< HEAD
  * @author Lens Protocol
-=======
- * @author Lens
->>>>>>> dd137b2 (Initial commit)
  *
  * @notice This abstract contract adds a simple non-specific follow validation function.
  *
@@ -25,9 +21,8 @@ import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
  * NOTE: This is only compatible with COLLECT & REFERENCE MODULES.
  */
 abstract contract FollowValidationModuleBase is ModuleBase {
-<<<<<<< HEAD
     /**
-     * @notice Validates wheter a given user is following a given profile.
+     * @notice Validates whether a given user is following a given profile.
      *
      * @dev It will revert if the user is not following the profile except the case when the user is the profile owner.
      *
@@ -45,16 +40,6 @@ abstract contract FollowValidationModuleBase is ModuleBase {
         }
         if (!isFollowing && IERC721(HUB).ownerOf(profileId) != user) {
             revert Errors.FollowInvalid();
-=======
-    function _checkFollowValidity(uint256 profileId, address user) internal view {
-        address followModule = ILensHub(HUB).getFollowModule(profileId);
-        if (followModule != address(0)) {
-            IFollowModule(followModule).validateFollow(profileId, user, 0);
-        } else {
-            address followNFT = ILensHub(HUB).getFollowNFT(profileId);
-            if (followNFT == address(0)) revert Errors.FollowInvalid();
-            if (IERC721(followNFT).balanceOf(user) == 0) revert Errors.FollowInvalid();
->>>>>>> dd137b2 (Initial commit)
         }
     }
 }

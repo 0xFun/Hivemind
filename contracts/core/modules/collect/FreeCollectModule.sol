@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
 
@@ -14,7 +14,7 @@ import {FollowValidationModuleBase} from '../FollowValidationModuleBase.sol';
  *
  * This module works by allowing all collects.
  */
-contract FreeCollectModule is ICollectModule, FollowValidationModuleBase {
+contract FreeCollectModule is FollowValidationModuleBase, ICollectModule {
     constructor(address hub) ModuleBase(hub) {}
 
     mapping(uint256 => mapping(uint256 => bool)) internal _followerOnlyByPublicationByProfile;
