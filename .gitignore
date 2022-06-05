@@ -27,3 +27,4 @@ addresses.json
 
 contracts/core/modules/follow/SecretCodeFollowModule.sol
 .dccache
+/node_modules
